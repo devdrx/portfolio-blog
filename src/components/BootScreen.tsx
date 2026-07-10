@@ -1,0 +1,167 @@
+import React, { useEffect, useState } from 'react';
+import { Sound } from './SoundController';
+
+interface BootScreenProps {
+  onComplete: () => void;
+}
+
+const BOOT_LOGS = [
+  'CORPUS DETECTED: portfolio-blog',
+  'INITIALIZING YoRHa OS v1.0.4...',
+  'BOOTING HARDWARE DIAGNOSTICS...',
+  'CPU Core 1-8: [ACTIVE]',
+  'MEMORY TEST: 65,536MB OK',
+  'CHECKING AUDIO CORE... WebAudioAPI [ONLINE]',
+  'MOUNTING COMPILER SYSTEM... TypeScript Compiler [READY]',
+  'LOADING VISUAL ENVIRONMENT... Vanilla CSS engine [LOADED]',
+  'ESTABLISHING NETWORK PROTOCOLS... localhost [SECURED]',
+  'LOADING USER CHIPS [React.chi, TS.chi, Math.chi, CP.chi]...',
+  'UPDATING CENTRAL REGISTRY DATABASE...',
+  'ALL SYSTEMS NOMINAL. ENGAGING USER SHELL.',
+];
+
+export const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
+  const [bootStarted, setBootStarted] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
+  const [progress, setProgress] = useState(0);
+  const [phase, setPhase] = useState<'text' | 'bar' | 'complete'>('text');
+
+  // Trigger boot sequence logs
+  useEffect(() => {
+    if (!bootStarted) return;
+
+    let logIdx = 0;
+    const interval = setInterval(() => {
+      if (logIdx < BOOT_LOGS.length) {
+        setLogs((prev) => [...prev, BOOT_LOGS[logIdx]]);
+        Sound.playHover();
+        logIdx++;
+      } else {
+        clearInterval(interval);
+        setPhase('bar');
+      }
+    }, 180);
+
+    return () => clearInterval(interval);
+  }, [bootStarted]);
+
+  // Trigger load progress bar
+  useEffect(() => {
+    if (phase !== 'bar') return;
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev < 100) {
+          const next = prev + Math.floor(Math.random() * 18) + 5;
+          Sound.playHover();
+          return Math.min(100, next);
+        } else {
+          clearInterval(interval);
+          setPhase('complete');
+          return 100;
+        }
+      });
+    }, 120);
+
+    return () => clearInterval(interval);
+  }, [phase]);
+
+  // Complete boot
+  useEffect(() => {
+    if (phase === 'complete') {
+      Sound.playChime();
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [phase, onComplete]);
+
+  const handleStartBoot = () => {
+    // Play sound immediately to unlock browser AudioContext
+    Sound.playWarning();
+    setBootStarted(true);
+  };
+
+  const handleSkip = () => {
+    Sound.playClick();
+    onComplete();
+  };
+
+  if (!bootStarted) {
+    return (
+      <div className="boot-screen" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="boot-terminal" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+          <div className="boot-logo">
+            GLORY TO MANKIND // YoRHa
+          </div>
+          
+          <div style={{ color: '#8c887a', fontSize: '14px', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}>
+            [ TACTICAL TERMINAL DETECTED ]
+          </div>
+          
+          <div style={{ color: '#d1cdbc', fontSize: '13px', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em', margin: '10px 0' }}>
+            AWAITING OPERATOR SYNC LINK PROTOCOL.
+          </div>
+
+          <div className="nier-double-line" style={{ width: '100%', borderColor: '#8c887a' }} />
+
+          <button 
+            className="nier-btn" 
+            onClick={handleStartBoot}
+            style={{ 
+              padding: '12px 30px', 
+              fontSize: '14px', 
+              color: '#d1cdbc',
+              borderColor: '#8c887a' 
+            }}
+          >
+            [ INITIATE CONNECTION ]
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="boot-screen">
+      <div className="boot-terminal">
+        <div className="boot-logo">
+          GLORY TO MANKIND // YoRHa
+        </div>
+        
+        <div style={{ minHeight: '320px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {logs.map((log, idx) => (
+            <div key={idx} style={{ color: '#d1cdbc', fontSize: '14px', letterSpacing: '0.05em' }}>
+              &gt; {log}
+            </div>
+          ))}
+        </div>
+
+        {(phase === 'bar' || phase === 'complete') && (
+          <div style={{ marginTop: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '14px' }}>
+              <span>SYSTEM LOADING: {progress}%</span>
+            </div>
+            <div className="boot-bar-container">
+              <div 
+                className="boot-bar-fill" 
+                style={{ width: `${progress}%`, transition: 'width 0.1s ease' }} 
+              />
+            </div>
+          </div>
+        )}
+
+        <div style={{ marginTop: '40px', alignSelf: 'flex-end' }}>
+          <button 
+            className="nier-btn danger" 
+            onClick={handleSkip}
+            style={{ padding: '6px 14px', fontSize: '12px' }}
+          >
+            [ SKIP BOOT SEQUENCE ]
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

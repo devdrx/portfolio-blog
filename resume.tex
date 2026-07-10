@@ -1,0 +1,308 @@
+\documentclass[a4paper,20pt]{article}
+ 
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[pdftex]{hyperref}
+\usepackage{ragged2e}
+\usepackage{fancyhdr}
+ 
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+ 
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.530in}
+\addtolength{\evensidemargin}{-0.375in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.45in}
+\addtolength{\textheight}{1in}
+ 
+\urlstyle{rm}
+ 
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+ 
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-10pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-6pt}]
+ 
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[2]{
+  \item\small{
+    \textbf{#1}{: #2 \vspace{-2pt}}
+  }
+}
+ 
+\newcommand{\resumeItemWithoutTitle}[1]{
+  \item\small{
+    {\vspace{-2pt}}
+  }
+}
+ 
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{#3} & \textit{#4} \\
+    \end{tabular*}\vspace{-5pt}
+}
+ 
+ 
+\newcommand{\resumeSubItem}[2]{\resumeItem{#1}{#2}\vspace{-3pt}}
+ 
+\renewcommand{\labelitemii}{$\circ$}
+ 
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=*]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+ 
+%-----------------------------
+%%%%%%  CV STARTS HERE  %%%%%%
+ 
+\begin{document}
+ 
+%----------HEADING-----------------
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+
+% \vspace{2pt}
+  \textbf{\huge Dev Darshan} & \Large{CS Undergraduate $\vert$ Backend/Fullstack} \\
+  \href{https://www.linkedin.com/in/dev-darshanx7124/}{LinkedIn: Dev Darshan} &  Mobile : +91 9937511482 \\
+   \href{https://github.com/devdrx}{GitHub: devdrx} &  \href{mailto:devclasher001@gmail.com}{devclasher001@gmail.com} \\
+  
+\end{tabular*}
+ 
+%-----------EDUCATION-----------------
+\vspace{-5pt}
+\section{~~Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Indian Institute of Information Technology, Lucknow}{Lucknow, India}
+      {Bachelor of Technology - Computer Science:  \textbf{(CGPA: 9.02)}}{August 2023 - June 2027}
+      \vspace{-1pt}
+      {\scriptsize  \footnotesize{\newline{}\textbf{Courses:} Data Structures, Web Development, OOPS, DBMS.}}
+   
+    \resumeSubheading
+      {DAV Public School, CSP}{Bhubaneswar, India}
+      {High School CBSE:  \textbf{(12th : 95.0\%, JEE mains: 99\%ile/9750 rank)}}{May 2021 - March 2023}
+      \vspace{-1pt}
+    \resumeSubHeadingListEnd
+    \vspace{-12pt}
+
+
+% \vspace{5pt}
+
+\vspace{5pt}
+% \section{Experience}
+
+%   \resumeSubHeadingListStart
+%    \resumeSubheading{\href{https://www.linkedin.com/in/rohan-prakash-b61112286/overlay/1727535423547/single-media-viewer/?profileId=ACoAAEVtkPkB5Fj6y8lpBVjfBPx3bJBi5jEYV5U}{Odisoft Technology Pvt. Ltd.}}{Sept 2024 - Present}
+%     {iOS Developer Intern}{India (Remote)}
+%     \resumeItemListStart
+%         \item
+%           {Developed iOS apps with SwiftUI, integrating user authentication and blockchain functionalities, enhancing app security and scalability by \textbf{20\%}}
+%           \vspace{-3pt}
+%           \item 
+%           {Collaborated with the \textbf{ team of 5 members} and participated in client meetings, enhancing project outcomes.}\vspace{-3pt}
+%           \item 
+%           {Integrated Supabase for backend services in SwiftUI projects, reducing development time by \textbf{30\%}  through streamlined database and authentication processes.}
+%       \resumeItemListEnd
+
+% \resumeSubHeadingListEnd
+      
+           
+% \vspace{-12pt}
+ 
+ 
+%-----------PROJECTS-----------------
+\vspace{1pt}
+\section{Projects}
+\resumeSubHeadingListStart
+\resumeSubheading{\href{https://github.com/hitarth-gg/MediSense?tab=readme-ov-file}{Medisense}}{}
+    {\textbf{Tech Stack -}  LLM, TensorFlow, Open-CV, React, Node.js, Flask, MongoDB}{}
+    \resumeItemListStart
+        \item
+        {\textbf{Overview}: Engineered an AI-driven diagnostic tool to expand healthcare access in remote areas, evaluating 100 patient reports monthly with 80\% diagnostic accuracy, accelerating early detection of conditions like lung cancer and pneumonia.}
+        \vspace{-3pt}
+        \item 
+        {
+        \textbf{Key Features:} Developed and trained an AI model for analyzing medical images, such as CT scans and MRIs; improved
+        detection accuracy of lung cancer and pneumonia by 30\%, facilitating quicker patient diagnosis.}
+        \resumeItemListEnd
+
+\resumeSubheading{\href{https://github.com/sarthaknayyar/cp-helper}{CP-Helper}}{}
+        {\textbf{Tech Stack -} MERN Stack, Tailwind CSS, Radix-UI, Codeforces API, d3.js}{}
+\resumeItemListStart
+    \item \textbf{Overview:} Prepared an all-in-one platform used by \textbf{1,000+} registered competitive programmers—offering \textbf{25+} mathematical calculators, an interactive graph simulator, and a beginner’s CP guide.
+    \item \textbf{Contribution:} Processed backend RESTful APIs. Combined \textbf{15+} reusable React components to improve UI consistency and reduce development time. Implemented a blog module to support content creation.
+    \item \textbf{Key Features:} Conceived 25+ calculators (modular arithmetic, combinatorics, prime checkers), an interactive D3.js graph simulator, and integrated 50+ Codeforces user IDs with 99.5\% API success. Authored a beginner’s CP guide (2,000+ views) and built a blogging system with posts, comments, and reactions.
+\resumeItemListEnd
+
+\resumeSubheading
+{\href{https://github.com/datmedevil17/jansunwAI}{JansunwAI}}{}
+{\textbf{Tech Stack -} MERN Stack, Ollama-Deepseek LLM, AssemblyAI(voice support), Tailwind }{}
+\resumeItemListStart
+    \item \textbf{Overview:} Created a simplified grievance management platform, which has support for multi user processing along with admin side controlling and management.
+    \item \textbf{Contribution:} In developing or integrating the ML models that would be used for PDF analysis, Voice Recognition in local language(Hindi) and classification of grievances. Also incorporated the mentioned models with fully working React components styled with Tailwind.
+    \item \textbf{Key Features:} Easy to use interface with language support and comprehensive tracking of grievance at all stages of lifecycle.
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+ 
+\vspace{-8pt}
+%-----------Awards-----------------
+ \section{Achievements}
+ \resumeSubHeadingListStart 
+    \item{
+        {
+        \textbf{Winner} of Hackofiesta 6.0 - AISpire UP \textbf{Hackathon} (Social Track Award).
+        }\hfill       
+        {\href{https://www.linkedin.com/posts/dev-darshanx7124_builtdifferent-hackofiesta6-technoforge-activity-7324037410659479552-Zmq3}{LinkedIn Post}}
+     }
+    \vspace{-7pt}
+    \item{
+        {
+        One of \textbf{Top 2\% selected} for FutureForce Tech Accelerator'25, \textbf{Salesforce} (120/5000 candidates)
+        }\hfill       
+        {\href{https://www.linkedin.com/posts/futureforce-salesforce-university-recruiting_futureforce-tech-accelerator-india-activity-7366107423310286849-cTwv/}{LinkedIn Post}}
+     }
+    \vspace{-7pt}
+    \item{
+        {
+        Solved \textbf{1000+} problems on multiple CP platforms like CC, CF, CSES, Leetcode, GFG.
+        }\hfill
+        {\href{https://github.com/devdrx/cp-submissions}{My Submissions}}
+     }
+
+    \vspace{-7pt}
+
+   \item{
+      Achieved \textbf{Specialist} rank on CodeForces competitive programming platform \textbf{(max rating: 1491).}\hfill{\href{https://codeforces.com/profile/X7124}{Profile Link}}
+     }
+
+    \vspace{-7pt}
+
+   \item{
+        {
+        Gained \textbf{4-star} rating on competitive coding platform CodeChef \textbf{(max rating: 1820)}.
+        }\hfill
+        {\href{https://www.codechef.com/users/iloveiiitl}{Profile Link}}        
+     }
+     
+    \vspace{-7pt}
+
+    \item{
+        {
+        Achieved \textbf{3rd} place in the Fresher’s Cup, competing against \textbf{200+} participants.
+        }\hfill        
+     }
+    \vspace{-7pt}
+   
+    \item{
+        {
+        Secured \textbf{40th rank} globally out of 3500 competitive programmers in Codechef Starters 157C. 
+        }
+        \hfill {\href{https://www.codechef.com/rankings/START157C?itemsPerPage=100&order=asc&page=1&sortBy=rank}{Contest Link}}
+     }
+    \vspace{-7pt}
+
+    %  \item{
+    %     {
+    %     Secured \textbf{254th rank} globally out of 4000 competitive programmers in Codechef Starters 147C. 
+    %     }
+    %     \hfill {\href{https://www.codechef.com/rankings/START147C?itemsPerPage=100&order=asc&page=3&sortBy=rank}{Contest Link}}
+    %  }
+
+    % \vspace{-8pt}
+     \item{
+        {
+        Secured \textbf{120th rank} globally out of 3300 competitive programmers in Codechef Starters 154C. 
+        }
+        \hfill {\href{https://www.codechef.com/rankings/START154C?itemsPerPage=100&order=asc&page=2&sortBy=rank}{Contest Link}}
+     }
+    \vspace{-7pt}
+
+    \item{
+        {
+        Secured \textbf{1712th rank} globally out of 20038 competitive programmers in Codeforces Div2. 
+        }
+        \hfill {\href{https://codeforces.com/contest/2102/standings/participant/210290446#p210290446}{Contest Link}}
+     }
+     \vspace{-7pt}
+     % \item{
+     %    {
+     %    Secured \textbf{2611st rank} globally out of 52019 competitive programmers in Codeforces Div4. 
+     %    }
+     %    \hfill {\href{https://codeforces.com/contest/2094/standings/participant/208394084#p20839408}{Contest Link}}
+     % }
+     % \vspace{-7pt}
+     
+     \vspace{2mm}
+
+     
+ \resumeSubHeadingListEnd 
+  
+
+
+
+%-----------PROJECTS-----------------
+
+%-----------EXPERIENCE-----------------
+
+\section{Skills}
+ \resumeSubHeadingListStart 
+   \item{
+     \textbf{Languages}{: JavaScript, Python, C++, Java, SQL}
+   }
+   \vspace{-5pt}
+   \item{
+     \textbf{Web}{: Node JS, React JS, Tailwind, MongoDB, Flask, Express, GraphQL}
+   }
+   \vspace{-5pt}
+   \item{
+     \textbf{Frameworks}{: TensorFlow, FastAPI, Streamlit, Selenium}
+   }
+   \vspace{-5pt}
+   \item{
+     \textbf{Developer Tools}{: Git, VS Code, IntelliJ IDEA, Colab/Jupyter, MySQL }
+   }
+   \vspace{-5pt}
+   \item{
+     \textbf{Libraries:}{ scikit-learn, numpy, pandas, matplotlib, openCV, nltk}
+   }
+ \resumeSubHeadingListEnd
+
+
+
+% \vspace{2pt}
+%------------Volunteer Experience------------------
+% Positions of Responsibility
+\section{Positions of Responsibility}
+\resumeSubHeadingListStart
+\resumeSubheading
+  {Member at Afterdark - Photography Society, IIITL}{Sept 2023 -- Present}
+  {Organized events with over \textbf{300+} participants.}{}
+\resumeSubheading
+  {Member at Crotonia - Literary Club, IIITL}{Sept 2023 -- Present}
+  {Encouraged reading books and appreciation to poetry}{}
+\resumeSubHeadingListEnd
+%------------Certifications------------------
+% \vspace{5pt}
+% \section{Certifications}
+%   \resumeSubHeadingListStart
+%     \resumeSubheading
+%   {Google Cloud Practitioner Program}{Google Clouds}
+%     {Google Cloud Services - IAM, Compute Engines, Buckets and Google Kubernetes Engine}{\href{}{\underline{Profile link}}}
+%     \resumeSubHeadingListEnd
+ 
+\end{document}

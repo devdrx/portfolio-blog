@@ -1,0 +1,566 @@
+/* --- YO-RHA OS DESIGN SYSTEM (NieR: Automata Style) --- */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'katex/dist/katex.min.css';
+
+:root {
+  /* Beige YoRHa Theme (Default) */
+  --nier-bg: #d1cdbc;
+  --nier-bg-alt: #c5c1b0;
+  --nier-bg-overlay: rgba(209, 205, 188, 0.85);
+  --nier-text: #4e4b42;
+  --nier-text-muted: #8c887a;
+  --nier-text-invert: #d1cdbc;
+  --nier-accent: #b04c3a;
+  --nier-accent-hover: #8f382a;
+  --nier-accent-dim: rgba(176, 76, 58, 0.15);
+  --nier-border: #7f7c6e;
+  --nier-border-muted: #a3a092;
+  --nier-grid-line: rgba(78, 75, 66, 0.05);
+  --nier-scanline: rgba(78, 75, 66, 0.04);
+  
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+  
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+:root.theme-dark {
+  /* Dark YoRHa Theme */
+  --nier-bg: #191815;
+  --nier-bg-alt: #24221d;
+  --nier-bg-overlay: rgba(25, 24, 21, 0.9);
+  --nier-text: #d1cdbc;
+  --nier-text-muted: #8c887a;
+  --nier-text-invert: #191815;
+  --nier-accent: #d15645;
+  --nier-accent-hover: #e57262;
+  --nier-accent-dim: rgba(209, 86, 69, 0.2);
+  --nier-border: #8c887a;
+  --nier-border-muted: #4a473e;
+  --nier-grid-line: rgba(209, 205, 188, 0.04);
+  --nier-scanline: rgba(209, 205, 188, 0.02);
+}
+
+/* Base resets & styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--nier-bg);
+  color: var(--nier-text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background grid styling */
+.nier-grid-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(var(--nier-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--nier-grid-line) 1px, transparent 1px),
+    linear-gradient(to right, var(--nier-grid-line) 1px, transparent 1px);
+  background-size: 20px 20px, 40px 40px, 40px 40px;
+  z-index: 100;
+}
+
+/* Scanline Effect */
+.nier-scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    var(--nier-scanline) 50%, 
+    transparent 50%
+  );
+  background-size: 100% 4px;
+  z-index: 99;
+  pointer-events: none;
+}
+
+.nier-scanline-bar {
+  position: fixed;
+  top: -100px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(78, 75, 66, 0.08) 50%,
+    transparent
+  );
+  z-index: 98;
+  pointer-events: none;
+  animation: scan 12s linear infinite;
+}
+
+@keyframes scan {
+  0% { top: -100px; }
+  100% { top: 100%; }
+}
+
+/* Noise overlay */
+.nier-noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.015;
+  z-index: 101;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--nier-bg-alt);
+  border-left: 1px solid var(--nier-border-muted);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--nier-border);
+  border: 1px solid var(--nier-bg-alt);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nier-text);
+}
+
+/* Typography & Layout structure */
+h1, h2, h3, h4, h5, h6, .nier-mono {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.title-decorator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--nier-border);
+  padding-bottom: 8px;
+}
+
+.title-decorator h2 {
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--nier-text);
+}
+
+.title-decorator .tag {
+  background-color: var(--nier-text);
+  color: var(--nier-bg);
+  padding: 2px 8px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+}
+
+.title-decorator .line {
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--nier-border-muted);
+}
+
+/* NieR standard buttons */
+.nier-btn {
+  position: relative;
+  background: transparent;
+  color: var(--nier-text);
+  border: 1px solid var(--nier-border);
+  padding: 8px 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  z-index: 1;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.nier-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--nier-text);
+  z-index: -1;
+  transition: left 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.nier-btn:hover {
+  color: var(--nier-bg);
+  border-color: var(--nier-text);
+}
+
+.nier-btn:hover::before {
+  left: 0;
+}
+
+.nier-btn:active {
+  transform: scale(0.97);
+}
+
+.nier-btn.active {
+  background-color: var(--nier-text);
+  color: var(--nier-bg);
+  border-color: var(--nier-text);
+}
+
+.nier-btn.danger {
+  border-color: var(--nier-accent);
+  color: var(--nier-accent);
+}
+
+.nier-btn.danger::before {
+  background-color: var(--nier-accent);
+}
+
+.nier-btn.danger:hover {
+  color: var(--nier-bg);
+}
+
+.nier-btn.small {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* Nier Borders and Layout structures */
+.nier-panel {
+  border: 1px solid var(--nier-border-muted);
+  background-color: var(--nier-bg-alt);
+  padding: 20px;
+  position: relative;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
+}
+
+.nier-panel::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 6px;
+  height: 6px;
+  border-top: 2px solid var(--nier-border);
+  border-left: 2px solid var(--nier-border);
+}
+
+.nier-panel::before {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 6px;
+  height: 6px;
+  border-bottom: 2px solid var(--nier-border);
+  border-right: 2px solid var(--nier-border);
+}
+
+.nier-header-line {
+  position: relative;
+  height: 12px;
+  border-bottom: 2px solid var(--nier-border);
+  margin-bottom: 20px;
+}
+
+.nier-header-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 30px;
+  height: 4px;
+  background-color: var(--nier-text);
+}
+
+.nier-header-line::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  width: 6px;
+  height: 6px;
+  background-color: var(--nier-text);
+  transform: rotate(45deg);
+}
+
+/* Double lines decoration */
+.nier-double-line {
+  height: 6px;
+  border-top: 1px solid var(--nier-border);
+  border-bottom: 1px solid var(--nier-border);
+  margin: 15px 0;
+}
+
+/* Glitch animation utility class */
+.glitch-hover:hover {
+  animation: glitch-anim 0.3s steps(2) infinite;
+}
+
+@keyframes glitch-anim {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  20% { transform: translate(-1px, -1px) rotate(0.5deg); }
+  40% { transform: translate(-2px, 0px) rotate(-0.5deg); }
+  60% { transform: translate(1px, -1px) rotate(0.5deg); }
+  80% { transform: translate(-1px, 1px) rotate(0deg); }
+  100% { transform: translate(0px, 0px) rotate(0deg); }
+}
+
+/* Typewriter animation utility */
+.typewriter {
+  display: inline-block;
+  overflow: hidden;
+  border-right: 0.15em solid var(--nier-text);
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  animation: 
+    typing 2.5s steps(40, end),
+    blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: var(--nier-text) }
+}
+
+/* Chip Loadout mini-game elements */
+.chip-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 10px;
+  border: 1px solid var(--nier-border-muted);
+  min-height: 200px;
+}
+
+.chip-cell {
+  background-color: var(--nier-bg);
+  aspect-ratio: 1;
+  border: 1px dashed var(--nier-border-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.chip-cell.filled {
+  background-color: var(--nier-text);
+  color: var(--nier-bg);
+  border-style: solid;
+  border-color: var(--nier-text);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.chip-cell.filled:hover {
+  opacity: 0.85;
+}
+
+.chip-cell.accent-filled {
+  background-color: var(--nier-accent);
+  color: var(--nier-bg);
+  border-style: solid;
+  border-color: var(--nier-accent);
+  cursor: pointer;
+}
+
+/* App-level shell styles */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px;
+  position: relative;
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 15px;
+  }
+}
+
+.content-section {
+  flex: 1;
+  margin-top: 30px;
+  animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* YoRHa boot screen overlay styles */
+.boot-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #191815;
+  color: #d1cdbc;
+  font-family: var(--font-mono);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 40px;
+  overflow: hidden;
+}
+
+.boot-terminal {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.boot-logo {
+  font-size: 32px;
+  border: 2px solid #d1cdbc;
+  padding: 10px 30px;
+  letter-spacing: 0.2em;
+  margin-bottom: 40px;
+  align-self: center;
+  animation: logo-flicker 1.5s infinite;
+}
+
+@keyframes logo-flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 1; }
+  50% { opacity: 0.65; }
+  55% { opacity: 1; }
+}
+
+.boot-bar-container {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(209, 205, 188, 0.2);
+  margin-top: 20px;
+  position: relative;
+}
+
+.boot-bar-fill {
+  height: 100%;
+  background-color: #d1cdbc;
+  width: 0%;
+}
+
+/* Blog Markdown Formatting Classes */
+.blog-link {
+  color: var(--nier-accent);
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.blog-link:hover {
+  color: var(--nier-accent-hover);
+}
+
+.inline-code {
+  font-family: var(--font-mono);
+  background-color: rgba(0, 0, 0, 0.06);
+  color: var(--nier-accent);
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 13px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+:root.theme-dark .inline-code {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255,255,255,0.05);
+}
+
+/* --- HIGHLIGHT.JS YORHA CODE THEME --- */
+.hljs {
+  color: var(--nier-text);
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-title,
+.hljs-section,
+.hljs-type,
+.hljs-name {
+  color: var(--nier-accent);
+  font-weight: 600;
+}
+
+.hljs-string,
+.hljs-doctag,
+.hljs-regexp,
+.hljs-attr {
+  color: var(--nier-text-muted);
+  font-style: italic;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--nier-text-muted);
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-built_in,
+.hljs-bullet,
+.hljs-symbol {
+  color: #ba5c4b;
+}
+
+.hljs-params,
+.hljs-variable,
+.hljs-template-variable {
+  color: var(--nier-text);
+}
+
+.hljs-meta {
+  color: #8c887a;
+}
+
