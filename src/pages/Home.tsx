@@ -1,9 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { GlitchText } from '../components/GlitchText';
 import { Sound } from '../components/SoundController';
+import { projectsService } from '../services/projects';
+import type { Project } from '../services/projects';
 import { Terminal, Cpu, ShieldAlert, Binary } from 'lucide-react';
 
 export const Home: React.FC = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [pfpUrl, setPfpUrl] = useState('/pfp.png');
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      const data = await projectsService.getProjects({ includeHidden: false });
+      setProjects(data);
+    };
+    loadProjects();
+
+    // Fetch active profile picture from Express backend configuration
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(data => {
+        if (data.pfpUrl) setPfpUrl(data.pfpUrl);
+      })
+      .catch(() => {});
+  }, []);
+
   const handleSystemDiagnose = () => {
     Sound.playWarning();
   };
@@ -51,23 +72,23 @@ export const Home: React.FC = () => {
                 }} 
               />
               
-              {/* Monospace Face Art */}
-              <pre style={{ fontSize: '10px', lineHeight: '10px', fontFamily: 'monospace', color: 'var(--nier-text)' }}>
-{`
-    _______
-  /  _____  \\
- /  /     \\  \\
-|  | () () |  |
-|  |   ^   |  |
- \\  \\_____/  /
-  \\_________/
-  [YoRHa-Dev]
-`}
-              </pre>
+            {/* Profile Picture */}
+              <img
+                src={pfpUrl}
+                alt="Unit Profile"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                  imageRendering: 'auto',
+                  filter: 'sepia(0.18) contrast(1.05)',
+                }}
+              />
             </div>
 
             <div style={{ textAlign: 'center', width: '100%' }}>
-              <h3 style={{ fontSize: '18px', marginBottom: '4px' }}>UNIT ID: 2B-DEV</h3>
+              <h3 style={{ fontSize: '18px', marginBottom: '4px' }}>UNIT ID: 9S-DEV</h3>
               <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--nier-text-muted)' }}>
                 CLASSIFICATION: SOFTWARE ENGINEER
               </p>
@@ -82,7 +103,7 @@ export const Home: React.FC = () => {
                 <span>9999 / 99.9%</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>BLOG ENTRIES:</span>
+                <span>PROJECT CATALOGS:</span>
                 <span>DECRYPTED</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -91,7 +112,7 @@ export const Home: React.FC = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>OS VERSION:</span>
-                <span>YoRHa v1.0.4</span>
+                <span>YoRHa v1.0.9</span>
               </div>
             </div>
           </div>
@@ -133,8 +154,9 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Side: Core Mission Logs / Bio */}
+        {/* Right Side: Core Mission Logs / Bio & Projects list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          
           {/* Main Bio / Overview */}
           <div className="nier-panel" style={{ flex: '1' }}>
             <div className="nier-header-line" />
@@ -143,7 +165,7 @@ export const Home: React.FC = () => {
             </h3>
             
             <p style={{ marginBottom: '15px', color: 'var(--nier-text)', fontSize: '14px', textAlign: 'justify' }}>
-              Welcome to the archives of 2B-DEV. This console serves as a visual and interactive portal showcasing expertise in 
+              Welcome to the archives of 9S-DEV. This console serves as a visual and interactive portal showcasing expertise in 
               <strong> Software Development</strong> and <strong>Web Engineering</strong>, modeled with precision and borrowing 
               tactical UI aesthetics directly from the YoRHa OS.
             </p>
@@ -177,6 +199,65 @@ export const Home: React.FC = () => {
                   <div>&gt; Sleep reserves critical (3.2%).</div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Projects showcase */}
+          <div className="nier-panel" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <h3 style={{ fontSize: '15px', borderBottom: '1px solid var(--nier-border-muted)', paddingBottom: '6px', fontFamily: 'var(--font-mono)' }}>
+              [ PROJECT_ARCHIVES ] // LOGGED_DEPLOYMENTS
+            </h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {projects.length > 0 ? projects.map(proj => (
+                <div 
+                  key={proj.id}
+                  style={{
+                    border: '1px solid var(--nier-border-muted)',
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    backgroundColor: 'rgba(0,0,0,0.01)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h4 style={{ fontSize: '13px', margin: 0, fontWeight: 'bold', fontFamily: 'var(--font-mono)' }}>{proj.title}</h4>
+                    {proj.featured && (
+                      <span style={{ fontSize: '9px', backgroundColor: 'var(--nier-accent)', color: 'var(--nier-bg)', padding: '1px 4px', fontFamily: 'var(--font-mono)', fontWeight: 'bold' }}>
+                        FEATURED
+                      </span>
+                    )}
+                  </div>
+                  
+                  <p style={{ fontSize: '12px', color: 'var(--nier-text)', margin: 0, lineHeight: '1.4' }}>{proj.description}</p>
+                  
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                    {proj.techStack.map(tech => (
+                      <span key={tech} style={{ fontSize: '8px', fontFamily: 'var(--font-mono)', border: '1px solid var(--nier-border-muted)', padding: '1px 4px' }}>
+                        {tech.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
+                    {proj.githubUrl && (
+                      <a href={proj.githubUrl} target="_blank" rel="noreferrer" className="nier-btn small" style={{ fontSize: '9px', padding: '2px 8px', textDecoration: 'none' }}>
+                        [ GITHUB SOURCE ]
+                      </a>
+                    )}
+                    {proj.demoUrl && (
+                      <a href={proj.demoUrl} target="_blank" rel="noreferrer" className="nier-btn small" style={{ fontSize: '9px', padding: '2px 8px', textDecoration: 'none' }}>
+                        [ LIVE DEMO ]
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )) : (
+                <p style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--nier-text-muted)', fontStyle: 'italic' }}>
+                  No logged deployments cataloged.
+                </p>
+              )}
             </div>
           </div>
 
@@ -217,3 +298,5 @@ export const Home: React.FC = () => {
     </div>
   );
 };
+
+export default Home;

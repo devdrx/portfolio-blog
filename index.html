@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YoRHa OS v1.0.4 // Portfolio & Blog</title>
     <!-- Google Fonts for NieR Automata Monospace & Interface Style -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://media.kitsu.app">
+    <link rel="dns-prefetch" href="https://media.kitsu.app">
+    <!-- Preload Critical Fonts for Fast Text Rendering & FCP -->
+    <link rel="preload" href="/fonts/font_34.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/font_35.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Local Cached Fonts for Offline & Fast Load Performance -->
+    <link rel="stylesheet" href="/fonts/local_fonts.css">
   </head>
   <body>
     <div id="root"></div>

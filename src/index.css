@@ -1,6 +1,5 @@
 /* --- YO-RHA OS DESIGN SYSTEM (NieR: Automata Style) --- */
 
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap');
 @import 'katex/dist/katex.min.css';
 
 :root {
@@ -18,6 +17,7 @@
   --nier-border-muted: #a3a092;
   --nier-grid-line: rgba(78, 75, 66, 0.05);
   --nier-scanline: rgba(78, 75, 66, 0.04);
+  --nier-link: #3a72c4;
   
   --font-mono: 'Share Tech Mono', monospace;
   --font-sans: 'Inter', sans-serif;
@@ -40,6 +40,7 @@
   --nier-border-muted: #4a473e;
   --nier-grid-line: rgba(209, 205, 188, 0.04);
   --nier-scanline: rgba(209, 205, 188, 0.02);
+  --nier-link: #7fb5ff;
 }
 
 /* Base resets & styles */
@@ -562,5 +563,141 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
 
 .hljs-meta {
   color: #8c887a;
+}
+
+/* --- YO-RHA ADMINISTRATIVE SYSTEM EXTENSIONS --- */
+.app-container-admin {
+  min-height: 100vh;
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+/* ─── YORHA AIRLOCK TRANSITION ─────────────────────────────────────────── */
+
+/* Bolt micro-vibration on impact */
+@keyframes airlock-bolt-vibrate {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-2px) rotate(-0.3deg); }
+  40%  { transform: translateX(2px) rotate(0.3deg); }
+  60%  { transform: translateX(-1px); }
+  80%  { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+
+/* LED status blink */
+@keyframes airlock-led-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.1; }
+}
+
+/* CRT glitch distortion on flash */
+@keyframes airlock-crt-glitch {
+  0%   { transform: translate(0, 0) skewX(0deg); filter: none; }
+  15%  { transform: translate(-3px, 2px) skewX(-1deg); filter: hue-rotate(20deg) saturate(1.5); }
+  30%  { transform: translate(3px, -1px) skewX(0.5deg); filter: hue-rotate(-10deg); }
+  45%  { transform: translate(-2px, 0) skewX(0deg); filter: none; }
+  60%  { transform: translate(4px, 1px) skewX(-0.5deg); filter: brightness(1.4); }
+  75%  { transform: translate(-1px, -2px) skewX(1deg); filter: none; }
+  90%  { transform: translate(2px, 0) skewX(-0.3deg); filter: brightness(0.8); }
+  100% { transform: translate(0, 0) skewX(0deg); filter: none; }
+}
+
+/* Individual glitch bar animations */
+@keyframes airlock-glitch-bar-0 {
+  0%   { transform: translateX(8px); opacity: 1; }
+  50%  { transform: translateX(-12px); opacity: 0.6; }
+  100% { transform: translateX(0); opacity: 0; }
+}
+@keyframes airlock-glitch-bar-1 {
+  0%   { transform: translateX(-10px); opacity: 0.8; }
+  50%  { transform: translateX(6px); opacity: 0.4; }
+  100% { transform: translateX(0); opacity: 0; }
+}
+@keyframes airlock-glitch-bar-2 {
+  0%   { transform: translateX(5px); opacity: 0.9; }
+  50%  { transform: translateX(-8px); opacity: 0.5; }
+  100% { transform: translateX(0); opacity: 0; }
+}
+
+/* Terminal cursor blink */
+@keyframes airlock-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Reduced-motion fallback simple fade */
+@keyframes airlock-simple-fade {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Zoom modal animations */
+@keyframes zoom-overlay-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes zoom-modal-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Blog markdown content hyperlink styling */
+.blog-content a {
+  color: var(--nier-text);
+  text-decoration: underline;
+  text-decoration-color: var(--nier-link);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.blog-content a:hover {
+  color: var(--nier-link);
+  text-decoration-color: var(--nier-link);
+}
+
+/* NieR styled range slider */
+.nier-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--nier-border-muted);
+  outline: none;
+  transition: opacity .2s;
+  border: none;
+}
+
+.nier-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: var(--nier-text);
+  border: 1px solid var(--nier-border);
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.nier-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: var(--nier-text);
+  border: 1px solid var(--nier-border);
+  cursor: pointer;
+  border-radius: 0;
 }
 

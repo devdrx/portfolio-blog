@@ -3,17 +3,12 @@ import { Sound } from '../components/SoundController';
 import { Volume2, VolumeX, ShieldCheck, PlayCircle } from 'lucide-react';
 
 export const SystemSettings: React.FC = () => {
-  const [isDark, setIsDark] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(30); // scale 0-100
+  const [volume, setVolume] = useState(30);
   const [showScanlines, setShowScanlines] = useState(true);
   const [typeSpeed, setTypeSpeed] = useState(40);
 
-  // Load configuration
   useEffect(() => {
-    const activeDark = document.documentElement.classList.contains('theme-dark');
-    setIsDark(activeDark);
-
     setIsMuted(Sound.isMuted());
     setVolume(Math.round(Sound.getVolume() * 100));
 
@@ -23,19 +18,6 @@ export const SystemSettings: React.FC = () => {
     const savedSpeed = localStorage.getItem('yorha_typewriter_speed');
     if (savedSpeed) setTypeSpeed(parseInt(savedSpeed));
   }, []);
-
-  const handleThemeToggle = () => {
-    Sound.playClick();
-    const nextDark = !isDark;
-    setIsDark(nextDark);
-    if (nextDark) {
-      document.documentElement.classList.add('theme-dark');
-      localStorage.setItem('yorha_theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('theme-dark');
-      localStorage.setItem('yorha_theme', 'light');
-    }
-  };
 
   const handleMuteToggle = () => {
     const nextMuted = Sound.toggleMute();
@@ -93,7 +75,7 @@ export const SystemSettings: React.FC = () => {
       {/* Header */}
       <div className="title-decorator">
         <span className="tag">SYSTEM</span>
-        <h2>[06_SYSTEM] // CONFIGURATION_PANEL</h2>
+        <h2>[04_SYSTEM] // CONFIGURATION_PANEL</h2>
         <div className="line" />
         <span className="tag">YoRHa OS v1.0.4</span>
       </div>
@@ -103,27 +85,10 @@ export const SystemSettings: React.FC = () => {
         {/* Left Side: System Options */}
         <div className="nier-panel" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <h3 style={{ fontSize: '15px', borderBottom: '1px solid var(--nier-border-muted)', paddingBottom: '6px' }}>
-            DISPLAY & THEME CONFIGS
+            DISPLAY CONFIGS
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontSize: '14px' }}>
-            
-            {/* Theme Select */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <strong>DARK_YORHA_MODE:</strong>
-                <div style={{ fontSize: '11px', color: 'var(--nier-text-muted)' }}>Toggles between sand-beige and carbon-black.</div>
-              </div>
-              <button 
-                className={`nier-btn small ${isDark ? 'active' : ''}`}
-                onClick={handleThemeToggle}
-                style={{ width: '120px' }}
-              >
-                {isDark ? '[ ON ]' : '[ OFF ]'}
-              </button>
-            </div>
-
-            <div className="nier-double-line" />
 
             {/* Scanlines Select */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -230,6 +195,32 @@ export const SystemSettings: React.FC = () => {
             <div style={{ fontSize: '12px' }}>
               <strong>YoRHa FIRMWARE OK:</strong> All settings are validated and cached in the browser's sandbox index (\`localStorage\`). Reboots will not clean loaded chip values.
             </div>
+          </div>
+
+          {/* Encrypted admin subport gateway */}
+          <div 
+            style={{ 
+              border: '1px dashed var(--nier-border-muted)', 
+              padding: '12px', 
+              backgroundColor: 'rgba(0,0,0,0.01)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}
+          >
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--nier-text-muted)', letterSpacing: '0.05em' }}>
+              DIAGNOSTIC_SUBPORT // MAINTENANCE_PORTAL_ENCRYPTED
+            </div>
+            <button 
+              className="nier-btn small" 
+              style={{ width: '100%', fontSize: '10px', color: 'var(--nier-text-muted)', border: '1px dashed var(--nier-border-muted)' }}
+              onClick={() => {
+                Sound.playWarning();
+                window.location.hash = '#/admin/login';
+              }}
+            >
+              [ CALIBRATE SYSTEM PORTAL ]
+            </button>
           </div>
 
         </div>

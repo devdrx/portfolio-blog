@@ -1,0 +1,18 @@
+[
+  {
+    "id": "media-1",
+    "name": "YoRHa_Main_Visual.jpg",
+    "url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80",
+    "size": 245,
+    "type": "image/jpeg",
+    "uploadedAt": "2026-07-09"
+  },
+  {
+    "id": "media-2",
+    "name": "System_Maintenance_Nodes.png",
+    "url": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=400&q=80",
+    "size": 512,
+    "type": "image/png",
+    "uploadedAt": "2026-07-08"
+  }
+]

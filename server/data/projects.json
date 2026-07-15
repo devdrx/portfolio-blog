@@ -1,0 +1,61 @@
+[
+  {
+    "id": "proj-medisense",
+    "title": "MediSense // AI Diagnostics Portal",
+    "description": "An AI-driven diagnostic engine developed to accelerate early condition detections (e.g. lung cancer, pneumonia) from CT scans and MRI imaging files using CNN filters.",
+    "techStack": [
+      "LLM",
+      "TensorFlow",
+      "OpenCV",
+      "React",
+      "Node.js",
+      "Flask",
+      "MongoDB"
+    ],
+    "githubUrl": "https://github.com/hitarth-gg/MediSense",
+    "demoUrl": "",
+    "imageUrl": "",
+    "order": 3,
+    "featured": false,
+    "visibility": "visible"
+  },
+  {
+    "id": "proj-cphelper",
+    "title": "CP-Helper // Algorithmic Toolkit",
+    "description": "An all-in-one platform for competitive programmers offering modular arithmetic tools, an interactive D3.js graph visualizer, and beginner guides serving 1,000+ programmers.",
+    "techStack": [
+      "React",
+      "Node.js",
+      "Express",
+      "Tailwind CSS",
+      "Codeforces API",
+      "D3.js"
+    ],
+    "githubUrl": "https://github.com/sarthaknayyar/cp-helper",
+    "demoUrl": "https://github.com/sarthaknayyar/cp-helper",
+    "imageUrl": "",
+    "order": 2,
+    "featured": true,
+    "visibility": "visible"
+  },
+  {
+    "id": "proj-jansunwai",
+    "title": "JansunwAI // Grievance Classifier",
+    "description": "Simplified grievance processing utility utilizing local Ollama-DeepSeek LLM structures and AssemblyAI speech-to-text recognition modules for regional language query indexing.",
+    "techStack": [
+      "MongoDB",
+      "Express",
+      "React",
+      "Node.js",
+      "Ollama",
+      "DeepSeek",
+      "AssemblyAI"
+    ],
+    "githubUrl": "https://github.com/datmedevil17/jansunwAI",
+    "demoUrl": "https://aspire-hackathon-one.vercel.app/",
+    "imageUrl": "",
+    "order": 1,
+    "featured": true,
+    "visibility": "visible"
+  }
+]

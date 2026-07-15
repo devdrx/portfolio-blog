@@ -1,0 +1,62 @@
+[
+  {
+    "id": "post-atcoder-dp",
+    "title": "AtCoder DP Contest Editorial",
+    "category": "ALGORITHMS",
+    "date": "2021-04-22",
+    "readTime": "15 min read",
+    "summary": "An editorial for the dynamic programming problems contained in the AtCoder DP Contest, with detailed transition equations and C++ code implementations.",
+    "status": "published",
+    "tags": [
+      "competitive programming",
+      "dp"
+    ],
+    "slug": "atcoder-dp-editorial",
+    "content": "# Introduction\n\nThis post contains the editorials for all tasks contained in the [AtCoder DP Contest](https://atcoder.jp/contests/dp/tasks), since there is no official editorial.\n\n## [A - Frog 1](https://atcoder.jp/contests/dp/tasks/dp_a)\n\n**Time Complexity:** $\\mathcal{O}(N)$\n\nUse dynamic programming and define $\\texttt{dp}[i]$ as the minimum cost to reach stone $i$. Then, there are only two transitions:\n\n- Jump one stone:\n  $$\\texttt{dp}[i + 1] = \\min(\\texttt{dp}[i + 1], \\texttt{dp}[i] + |\\texttt{A}[i] - \\texttt{A}[i + 1]|)$$\n\n- Jump two stones:\n  $$\\texttt{dp}[i + 2] = \\min_{0 \\le i + j < N}(\\texttt{dp}[i + 2], \\texttt{dp}[i] + |\\texttt{A}[i] - \\texttt{A}[i + 2]|)$$\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\nconst int mx = 1e5+1;\nint A[mx], dp[mx];\nint main() {\n\tcin.tie(0)->sync_with_stdio(0);\n\tint N; cin >> N;\n\tfor(int i = 0; i < N; ++i) {\n\t\tcin >> A[i];\n\t\tdp[i] = 1e9 + 7;\n\t}\n\tdp[0] = 0;\n\tfor(int i = 0; i < N; ++i) {\n\t\tif(i + 1 < N) dp[i + 1] = min(dp[i + 1], dp[i] + abs(A[i] - A[i + 1]));\n\t\tif(i + 2 < N) dp[i + 2] = min(dp[i + 2], dp[i] + abs(A[i] - A[i + 2]));\n\t}\n\tcout << dp[N - 1] << endl;\n}\n```\n\n## [B - Frog 2](https://atcoder.jp/contests/dp/tasks/dp_b)\n\n**Time Complexity:** $\\mathcal{O}(NK)$\n\nThis is the exact same problem as Frog 1, just with variable distances. Simply loop through each of the possible jumps, and use the previous transition where $\\texttt{dp}[i]$ represents the best value for stone $i$.\n\n$$\\texttt{dp}[i + j] = \\min_{0 \\le i + j < N}(\\texttt{dp}[i + j], \\texttt{dp}[i] + |\\texttt{A}[i] - \\texttt{A}[i + j]|)$$\n\n```cpp\n#include <bits/stdc++.h>\nusing namespace std;\nconst int mx = 1e5+1;\nint A[mx], dp[mx];\nint main() {\n\tcin.tie(0)->sync_with_stdio(0);\n\tint N, K; cin >> N >> K;\n\tfor(int i = 0; i < N; ++i) {\n\t\tcin >> A[i];\n\t\tdp[i] = 1e9 + 7;\n\t}\n\tdp[0] = 0;\n\tfor(int i = 0; i < N; ++i) {\n\t\tfor(int j = 1; j <= K; ++j) {\n\t\t\tif(i + j < N) dp[i + j] = min(dp[i + j], dp[i] + abs(A[i] - A[i + j]));\n\t\t}\n\t}\n\tcout << dp[N - 1] << endl;\n}\n```"
+  },
+  {
+    "id": "post-1",
+    "title": "Algorithms in Game Design // Graph Traversals in YoRHa Modules",
+    "category": "ALGORITHMS",
+    "date": "2026-07-09",
+    "readTime": "6 min read",
+    "summary": "An analysis of graph theory, grid traversal optimizations (like Dijkstra and A*), and how tactical HUD displays utilize scan lines for fast routing matrices.",
+    "status": "published",
+    "tags": [
+      "algorithms",
+      "pathfinding"
+    ],
+    "slug": "graph-traversals-yorha",
+    "content": "## System Initialization: Graph Traversal\n\nIn modern tactical grid engines, representing spatial architectures efficiently is paramount. A standard 2D layout (like a map matrix) is modeled as a grid graph $G = (V, E)$, where each grid cell represents a vertex $v \\in V$, and edges $e \\in E$ represent paths to adjacent cells.\n\n### Grid Scan and Dijkstra Node Computations\n\nUsing Dijkstra's algorithm allows the unit to find the shortest path from node $S$ to $T$ on a grid with weights representing terrain difficulties (e.g., enemy barriers, water obstacles). The priority queue evaluates vertices based on:\n\n$$d(v) = \\min \\{ d(u) + w(u, v) \\}$$\n\n```typescript\n// Dijkstra Node Scan Structure\ninterface Node {\n  row: number;\n  col: number;\n  distance: number;\n  isVisited: boolean;\n  previousNode: Node | null;\n}\n```\n\nBy scanning cells radially, YoRHa units can dynamically re-compute routes in real-time when blocking obstacles are placed in the environment.\n\n### Optimization Matrix\n\n1. **Binary Heaps**: Reduces queue search complexity from $O(V)$ to $O(\\log V)$.\n2. **Scan Filters**: Halts expansions once target node $T$ is marked as visited, saving up to 40% memory cycles."
+  },
+  {
+    "id": "post-2",
+    "title": "CSS Architecture // Recreating YoRHa UI Grids & Scanning Elements",
+    "category": "SOFTWARE",
+    "date": "2026-06-30",
+    "readTime": "4 min read",
+    "summary": "A look behind the stylesheets. Learn how custom gradients, keyframe animations, scanline bars, and subtle grain effects are orchestrated to produce premium retro digital interfaces.",
+    "status": "published",
+    "tags": [
+      "css",
+      "frontend"
+    ],
+    "slug": "css-architecture-yorha",
+    "content": "## The Anatomy of YoRHa UI\n\nThe UI design of NieR: Automata is celebrated for its elegance, tactical responsiveness, and beige color schemes. Achieving this in a modern browser requires standard Vanilla CSS and custom CSS variables.\n\n### The Dotted Grid Overlay\n\nTo give a page a military-grade CRT screen look, we overlay a repeating radial gradient. This generates fine, subtle background dots:\n\n```css\n.nier-grid-overlay {\n  background-image: \n    radial-gradient(var(--nier-grid-line) 1px, transparent 1px);\n  background-size: 20px 20px;\n}\n```\n\n### Scanline Scrolling Animations\n\nA linear gradient combined with a slow vertical keyframe animation mimics screen scan refreshes. We keep opacity very low (around 3%) to ensure readability is not compromised:\n\n```css\n@keyframes scan {\n  0% { top: -100px; }\n  100% { top: 100%; }\n}\n```\n\n### Key Stylings to Keep in Mind\n\n- **Monospace Text**: Use `Share Tech Mono` for numerical lists and stat callouts.\n- **Micro-Glitches**: Inject slight pixel transformations on buttons when hovered to suggest mechanical interference."
+  },
+  {
+    "id": "post-3",
+    "title": "Otaku Analysis // The Cybernetic Despair of Serial Experiments Lain",
+    "category": "ART & CULTURE",
+    "date": "2026-06-15",
+    "readTime": "8 min read",
+    "summary": "Exploring the philosophical constructs, wire matrices, and identity breakdowns inside the classic 1998 cyberpunk masterpiece Serial Experiments Lain.",
+    "status": "published",
+    "tags": [
+      "anime",
+      "philosophy"
+    ],
+    "slug": "cybernetic-despair-lain",
+    "content": "## Welcome to the Wired\n\n*Serial Experiments Lain* (1998) stands as one of the most prescient anime series ever created. It explores the blurred boundaries between the physical world (The Real World) and the digital network (The Wired).\n\n### Identity and the Collective Consciousness\n\nLain Iwakura's journey shows the devolution of physical selfhood into omnipotent digital matrices. The series poses several core questions:\n- *Is physical presence a requirement for existence?*\n- *Can memories exist independently of human brains?*\n- *Does the network constitute a new godhead?*\n\n### Visual Language\n\nThe series uses ambient noise, humming power lines, and sharp contrasting shadows. This aesthetic directly matches the desolation and post-humanism found in the NieR ruins. The power line hum represents the constant, inescapable voice of the Wired."
+  }
+]
