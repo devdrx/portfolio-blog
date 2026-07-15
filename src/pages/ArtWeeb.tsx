@@ -926,7 +926,7 @@ export const ArtWeeb: React.FC = () => {
                   </button>
 
                   <button 
-                    className="nier-btn" 
+                    className={`nier-btn ${repeatMode === 'none' ? 'muted' : ''}`} 
                     onClick={() => {
                       Sound.playClick();
                       setRepeatMode(prev => prev === 'all' ? 'one' : prev === 'one' ? 'none' : 'all');
@@ -936,9 +936,7 @@ export const ArtWeeb: React.FC = () => {
                       padding: '6px 10px', 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: '4px',
-                      color: repeatMode === 'none' ? 'var(--nier-text-muted)' : 'var(--nier-text)',
-                      borderColor: repeatMode === 'none' ? 'var(--nier-border-muted)' : 'var(--nier-border)'
+                      gap: '4px'
                     }}
                     title={`REPEAT MODE: ${repeatMode.toUpperCase()}`}
                   >

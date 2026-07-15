@@ -248,6 +248,16 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   color: var(--nier-bg);
 }
 
+.nier-btn.muted {
+  border-color: var(--nier-border-muted) !important;
+  color: var(--nier-text-muted) !important;
+}
+
+.nier-btn.muted:hover {
+  color: var(--nier-bg) !important;
+  border-color: var(--nier-text) !important;
+}
+
 .nier-btn.small {
   padding: 4px 10px;
   font-size: 12px;
