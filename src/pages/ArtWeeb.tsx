@@ -1341,7 +1341,7 @@ export const ArtWeeb: React.FC = () => {
               fontFamily: 'var(--font-mono)',
               fontSize: '12px'
             }}>
-              <span>DETAILED_VISUAL_FEED // {wallpapers[currentWallpaperIdx]?.original.split('/').pop()}</span>
+              <span>DETAILED_VISUAL_FEED // {wallpapers[currentWallpaperIdx]?.original?.split('/').pop() || ''}</span>
               
               <button 
                 onClick={() => {
