@@ -94,7 +94,7 @@ export const ArtWeeb: React.FC = () => {
   const [scStatus, setScStatus] = useState<'idle' | 'loading' | 'ok' | 'error' | 'no-key'>('idle');
   const [scError, setScError] = useState('');
   const [selectedAnimeIdx, setSelectedAnimeIdx] = useState(0);
-  const [wallpapers, setWallpapers] = useState<string[]>([]);
+  const [wallpapers, setWallpapers] = useState<{ original: string; thumbnail: string }[]>([]);
   const [currentWallpaperIdx, setCurrentWallpaperIdx] = useState(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
 
@@ -492,7 +492,7 @@ export const ArtWeeb: React.FC = () => {
                       }}
                     >
                       <img 
-                        src={wallpapers[(currentWallpaperIdx - 1 + wallpapers.length) % wallpapers.length]} 
+                        src={wallpapers[(currentWallpaperIdx - 1 + wallpapers.length) % wallpapers.length]?.thumbnail} 
                         alt="Previous preview" 
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         loading="lazy"
@@ -520,7 +520,7 @@ export const ArtWeeb: React.FC = () => {
                       className="glitch-hover"
                     >
                       <img 
-                        src={wallpapers[currentWallpaperIdx]} 
+                        src={wallpapers[currentWallpaperIdx]?.thumbnail} 
                         alt="Active wallpaper view" 
                         style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'sepia(0.12)' }}
                       />
@@ -579,7 +579,7 @@ export const ArtWeeb: React.FC = () => {
                       }}
                     >
                       <img 
-                        src={wallpapers[(currentWallpaperIdx + 1) % wallpapers.length]} 
+                        src={wallpapers[(currentWallpaperIdx + 1) % wallpapers.length]?.thumbnail} 
                         alt="Next preview" 
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         loading="lazy"
@@ -1311,7 +1311,7 @@ export const ArtWeeb: React.FC = () => {
               fontFamily: 'var(--font-mono)',
               fontSize: '12px'
             }}>
-              <span>DETAILED_VISUAL_FEED // {wallpapers[currentWallpaperIdx].split('/').pop()}</span>
+              <span>DETAILED_VISUAL_FEED // {wallpapers[currentWallpaperIdx]?.original.split('/').pop()}</span>
               
               <button 
                 onClick={() => {
@@ -1344,7 +1344,7 @@ export const ArtWeeb: React.FC = () => {
               width: '100%'
             }}>
               <img 
-                src={wallpapers[currentWallpaperIdx]} 
+                src={wallpapers[currentWallpaperIdx]?.original} 
                 alt="Zoomed wallpaper view" 
                 style={{
                   maxWidth: '100%',

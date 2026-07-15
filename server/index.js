@@ -12,6 +12,7 @@ import { existsSync, mkdirSync, unlinkSync, readdirSync } from 'fs';
 import { join, dirname, extname } from 'path';
 import { fileURLToPath } from 'url';
 import { Post, Project, Media, Setting, Log, Auth, seedDatabase } from './db.js';
+import Jimp from 'jimp';
 
 dotenv.config();
 
@@ -34,6 +35,9 @@ if (!existsSync(UPLOADS_DIR)) mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const WALLPAPERS_DIR = join(__dirname, '..', 'public', 'wallpapers');
 if (!existsSync(WALLPAPERS_DIR)) mkdirSync(WALLPAPERS_DIR, { recursive: true });
+
+const THUMBS_DIR = join(WALLPAPERS_DIR, 'thumbs');
+if (!existsSync(THUMBS_DIR)) mkdirSync(THUMBS_DIR, { recursive: true });
 
 const SONGS_DIR = join(__dirname, '..', 'public', 'songs');
 if (!existsSync(SONGS_DIR)) mkdirSync(SONGS_DIR, { recursive: true });
@@ -647,9 +651,32 @@ app.get('/api/wallpapers', (req, res) => {
       return res.json([]);
     }
     const files = readdirSync(WALLPAPERS_DIR)
-      .filter(file => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file))
-      .map(file => `/wallpapers/${file}`);
-    res.json(files);
+      .filter(file => file !== 'thumbs' && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file));
+      
+    const result = files.map(file => {
+      const thumbExists = existsSync(join(THUMBS_DIR, file));
+      return {
+        original: `/wallpapers/${file}`,
+        thumbnail: thumbExists ? `/wallpapers/thumbs/${file}` : `/wallpapers/${file}`
+      };
+    });
+
+    res.json(result);
+
+    // Generate missing thumbnails asynchronously in the background
+    files.forEach(async (file) => {
+      const originalPath = join(WALLPAPERS_DIR, file);
+      const thumbPath = join(THUMBS_DIR, file);
+      if (!existsSync(thumbPath)) {
+        try {
+          const image = await Jimp.read(originalPath);
+          await image.resize(500, Jimp.AUTO).quality(80).writeAsync(thumbPath);
+          console.log(`[SYSTEM] Generated thumbnail for: ${file}`);
+        } catch (err) {
+          console.error(`[SYSTEM] Failed generating thumbnail for ${file}:`, err.message);
+        }
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
