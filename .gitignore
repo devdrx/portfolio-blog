@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+# Wallpapers generated thumbnails
+public/wallpapers/thumbs/

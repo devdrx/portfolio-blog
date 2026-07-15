@@ -64,6 +64,8 @@ app.use(express.json({ limit: '10mb' }));
 
 // Static file serving of uploads directory
 app.use('/api/uploads', express.static(UPLOADS_DIR));
+app.use('/wallpapers', express.static(WALLPAPERS_DIR));
+app.use('/songs', express.static(SONGS_DIR));
 
 // Auth verification middleware
 const authenticate = (req, res, next) => {
