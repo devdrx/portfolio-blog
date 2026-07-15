@@ -114,6 +114,18 @@ export const ArtWeeb: React.FC = () => {
     fetchSongs();
   }, []);
 
+  // Poll wallpapers if any thumbnail is still generating (null)
+  useEffect(() => {
+    if (wallpapers.length === 0) return;
+    const hasGenerating = wallpapers.some((w) => !w.thumbnail);
+    if (hasGenerating) {
+      const timer = setTimeout(() => {
+        fetchWallpapers();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [wallpapers]);
+
   // Safeguard index in case wallpapers are added/removed dynamically
   useEffect(() => {
     if (wallpapers.length > 0 && currentWallpaperIdx >= wallpapers.length) {
@@ -491,12 +503,18 @@ export const ArtWeeb: React.FC = () => {
                         filter: 'sepia(0.3) blur(1px)'
                       }}
                     >
-                      <img 
-                        src={wallpapers[(currentWallpaperIdx - 1 + wallpapers.length) % wallpapers.length]?.thumbnail} 
-                        alt="Previous preview" 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        loading="lazy"
-                      />
+                      {!wallpapers[(currentWallpaperIdx - 1 + wallpapers.length) % wallpapers.length]?.thumbnail ? (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', color: 'var(--nier-text-muted)', fontSize: '8px', fontFamily: 'var(--font-mono)' }}>
+                          [ GENERATING THUMB... ]
+                        </div>
+                      ) : (
+                        <img 
+                          src={wallpapers[(currentWallpaperIdx - 1 + wallpapers.length) % wallpapers.length]?.thumbnail} 
+                          alt="Previous preview" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          loading="lazy"
+                        />
+                      )}
                     </div>
 
                     {/* Active Centered Image */}
@@ -519,11 +537,17 @@ export const ArtWeeb: React.FC = () => {
                       }}
                       className="glitch-hover"
                     >
-                      <img 
-                        src={wallpapers[currentWallpaperIdx]?.thumbnail} 
-                        alt="Active wallpaper view" 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'sepia(0.12)' }}
-                      />
+                      {!wallpapers[currentWallpaperIdx]?.thumbnail ? (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', color: 'var(--nier-text-muted)', fontSize: '10px', fontFamily: 'var(--font-mono)' }}>
+                          [ GENERATING THUMBNAIL... ]
+                        </div>
+                      ) : (
+                        <img 
+                          src={wallpapers[currentWallpaperIdx]?.thumbnail} 
+                          alt="Active wallpaper view" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'sepia(0.12)' }}
+                        />
+                      )}
                       {/* Technical visual coordinates inside image frame */}
                       <div style={{
                         position: 'absolute',
@@ -578,12 +602,18 @@ export const ArtWeeb: React.FC = () => {
                         filter: 'sepia(0.3) blur(1px)'
                       }}
                     >
-                      <img 
-                        src={wallpapers[(currentWallpaperIdx + 1) % wallpapers.length]?.thumbnail} 
-                        alt="Next preview" 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        loading="lazy"
-                      />
+                      {!wallpapers[(currentWallpaperIdx + 1) % wallpapers.length]?.thumbnail ? (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', color: 'var(--nier-text-muted)', fontSize: '8px', fontFamily: 'var(--font-mono)' }}>
+                          [ GENERATING THUMB... ]
+                        </div>
+                      ) : (
+                        <img 
+                          src={wallpapers[(currentWallpaperIdx + 1) % wallpapers.length]?.thumbnail} 
+                          alt="Next preview" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          loading="lazy"
+                        />
+                      )}
                     </div>
                   </div>
 

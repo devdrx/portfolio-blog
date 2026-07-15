@@ -653,30 +653,34 @@ app.get('/api/wallpapers', (req, res) => {
     const files = readdirSync(WALLPAPERS_DIR)
       .filter(file => file !== 'thumbs' && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file));
       
+    let hasMissingThumbs = false;
     const result = files.map(file => {
       const thumbExists = existsSync(join(THUMBS_DIR, file));
+      if (!thumbExists) hasMissingThumbs = true;
       return {
         original: `/wallpapers/${file}`,
-        thumbnail: thumbExists ? `/wallpapers/thumbs/${file}` : `/wallpapers/${file}`
+        thumbnail: thumbExists ? `/wallpapers/thumbs/${file}` : null // null indicates it is being generated
       };
     });
 
     res.json(result);
 
     // Generate missing thumbnails asynchronously in the background
-    files.forEach(async (file) => {
-      const originalPath = join(WALLPAPERS_DIR, file);
-      const thumbPath = join(THUMBS_DIR, file);
-      if (!existsSync(thumbPath)) {
-        try {
-          const image = await Jimp.read(originalPath);
-          await image.resize(500, Jimp.AUTO).quality(80).writeAsync(thumbPath);
-          console.log(`[SYSTEM] Generated thumbnail for: ${file}`);
-        } catch (err) {
-          console.error(`[SYSTEM] Failed generating thumbnail for ${file}:`, err.message);
+    if (hasMissingThumbs) {
+      files.forEach(async (file) => {
+        const originalPath = join(WALLPAPERS_DIR, file);
+        const thumbPath = join(THUMBS_DIR, file);
+        if (!existsSync(thumbPath)) {
+          try {
+            const image = await Jimp.read(originalPath);
+            await image.resize(500, Jimp.AUTO).quality(80).writeAsync(thumbPath);
+            console.log(`[SYSTEM] Asynchronously generated thumbnail for: ${file}`);
+          } catch (err) {
+            console.error(`[SYSTEM] Failed generating thumbnail for ${file}:`, err.message);
+          }
         }
-      }
-    });
+      });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -727,9 +731,39 @@ if (existsSync(DIST_DIR)) {
   });
 }
 
+// Scan all wallpapers and pre-generate missing thumbnails on boot
+const generateAllThumbnails = async () => {
+  console.log('[DATABASE] Scanning wallpapers for missing thumbnails...');
+  try {
+    if (!existsSync(WALLPAPERS_DIR)) return;
+    const files = readdirSync(WALLPAPERS_DIR)
+      .filter(file => file !== 'thumbs' && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file));
+      
+    for (const file of files) {
+      const originalPath = join(WALLPAPERS_DIR, file);
+      const thumbPath = join(THUMBS_DIR, file);
+      if (!existsSync(thumbPath)) {
+        try {
+          console.log(`[DATABASE] Pre-generating thumbnail: ${file}`);
+          const image = await Jimp.read(originalPath);
+          await image.resize(500, Jimp.AUTO).quality(80).writeAsync(thumbPath);
+        } catch (err) {
+          console.error(`[DATABASE] Failed generating thumbnail for ${file}:`, err.message);
+        }
+      }
+    }
+    console.log('[DATABASE] Thumbnail scan completed.');
+  } catch (err) {
+    console.error('[DATABASE] Thumbnail scan failed:', err.message);
+  }
+};
+
 app.listen(PORT, async () => {
   // Boot check: populate database tables if empty
   await seedDatabase();
+
+  // Pre-generate thumbnails so clients load fast
+  await generateAllThumbnails();
 
   console.log(`\n  ╔══════════════════════════════════════╗`);
   console.log(`  ║  YoRHa API Server v2.0 — ONLINE      ║`);
