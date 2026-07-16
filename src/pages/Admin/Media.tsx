@@ -115,13 +115,13 @@ export const Media: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* Header controls bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--nier-border)', paddingBottom: '12px' }}>
+      <div className="admin-header-bar">
         <h2 style={{ fontSize: '18px', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
           <ImageIcon size={18} /> [ SYSTEM MEDIA MODULE VAULT ]
         </h2>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: '30px' }}>
+      <div className="admin-dashboard-grid">
         
         {/* Left Side: Uploads & Library Grid */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

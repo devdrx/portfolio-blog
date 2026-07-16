@@ -136,7 +136,7 @@ export const Projects: React.FC = () => {
       {view === 'list' && (
         <>
           {/* Header controls bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--nier-border)', paddingBottom: '12px' }}>
+          <div className="admin-header-bar">
             <h2 style={{ fontSize: '18px', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
               <FolderGit size={18} /> [ PORTFOLIO PROJECT CARDS REGISTRY ]
             </h2>
@@ -146,7 +146,7 @@ export const Projects: React.FC = () => {
           </div>
 
           {/* Grid layout cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
             {loading ? (
               <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--nier-text-muted)', textAlign: 'center', gridColumn: '1/-1' }}>
                 SCANNING DATA BLOCKS...

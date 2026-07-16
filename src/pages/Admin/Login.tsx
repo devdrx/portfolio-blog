@@ -90,7 +90,8 @@ export const Login: React.FC = () => {
       <div 
         className="nier-panel" 
         style={{
-          width: '450px',
+          width: '100%',
+          maxWidth: '450px',
           padding: '30px',
           border: error ? '2px solid var(--nier-accent)' : '2px solid var(--nier-border)',
           backgroundColor: 'var(--nier-bg)',

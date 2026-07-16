@@ -133,7 +133,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Main split sections: Actions & Logs */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '30px' }}>
+      <div className="admin-dashboard-grid">
         
         {/* Left Side: System Details & Actions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

@@ -244,13 +244,13 @@ export const Settings: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--nier-border)', paddingBottom: '12px' }}>
+      <div className="admin-header-bar">
         <h2 style={{ fontSize: '18px', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
           <SettingsIcon size={18} /> [ SYSTEM CONFIGURATION AND CALIBRATION ]
         </h2>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+      <div className="admin-split-view">
         
         {/* Left Side: Database actions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

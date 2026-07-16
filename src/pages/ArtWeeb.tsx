@@ -406,7 +406,7 @@ export const ArtWeeb: React.FC = () => {
         <span className="tag">WEEB CORE</span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.3fr', gap: '30px', alignItems: 'stretch' }}>
+      <div className="art-grid-main">
         
         {/* Left Side: Art Gallery & Anime Logs */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
@@ -681,7 +681,7 @@ export const ArtWeeb: React.FC = () => {
               <Film size={16} /> OTAKU_DATA_RECORDS
             </h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px', minHeight: '260px' }}>
+            <div className="jukebox-grid">
               {/* Left Column: Anime Selection Tabs */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {animeLogs.map((log, idx) => {
@@ -991,7 +991,7 @@ export const ArtWeeb: React.FC = () => {
                 </div>
 
                 {/* Playlist log details */}
-                <div style={{ 
+                <div className="jukebox-tracks-container" style={{ 
                   display: 'flex', 
                   flexDirection: 'column', 
                   gap: '6px', 
@@ -1248,6 +1248,7 @@ export const ArtWeeb: React.FC = () => {
               setCurrentWallpaperIdx(prev => (prev - 1 + wallpapers.length) % wallpapers.length);
             }}
             onMouseEnter={() => Sound.playHover()}
+            className="zoom-nav-btn left"
             style={{
               position: 'absolute',
               left: '40px',
@@ -1283,6 +1284,7 @@ export const ArtWeeb: React.FC = () => {
               setCurrentWallpaperIdx(prev => (prev + 1) % wallpapers.length);
             }}
             onMouseEnter={() => Sound.playHover()}
+            className="zoom-nav-btn right"
             style={{
               position: 'absolute',
               right: '40px',
@@ -1310,6 +1312,7 @@ export const ArtWeeb: React.FC = () => {
           </button>
           
           <div 
+            className="zoom-modal-container"
             style={{
               position: 'relative',
               maxWidth: '80%', // Leaves margins on either side for viewport navigation buttons

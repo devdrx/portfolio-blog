@@ -10,7 +10,9 @@ import {
   Terminal, 
   LogOut, 
   Clock,
-  House
+  House,
+  Menu,
+  X
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -19,6 +21,7 @@ interface AdminLayoutProps {
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sessionTime, setSessionTime] = useState(authService.getSessionExpiry());
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const currentHash = window.location.hash || '#/admin';
 
   useEffect(() => {
@@ -49,6 +52,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   const handleNav = (hash: string) => {
     Sound.playClick();
+    setIsSidebarOpen(false);
     window.location.hash = hash;
   };
 
@@ -69,27 +73,23 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div 
-      style={{
-        display: 'flex', 
-        minHeight: '100vh', 
-        backgroundColor: 'var(--nier-bg)', 
-        color: 'var(--nier-text)',
-        fontFamily: 'var(--font-sans)',
-        position: 'relative'
-      }}
-    >
+    <div className="admin-shell-container">
+      {/* Mobile Drawer Overlay */}
+      {isSidebarOpen && (
+        <div 
+          onClick={() => { Sound.playClick(); setIsSidebarOpen(false); }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(2px)',
+            zIndex: 99
+          }}
+        />
+      )}
+
       {/* Sidebar Nav */}
-      <div 
-        style={{
-          width: '260px',
-          borderRight: '1px solid var(--nier-border)',
-          backgroundColor: 'var(--nier-bg-alt)',
-          display: 'flex',
-          flexDirection: 'column',
-          zIndex: 10
-        }}
-      >
+      <div className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         {/* Console headers */}
         <div 
           style={{
@@ -207,15 +207,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       </div>
 
       {/* Main Content Areas */}
-      <div 
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100vh',
-          overflowY: 'auto'
-        }}
-      >
+      <div className="admin-main-area">
         {/* Top status bar */}
         <div 
           style={{
@@ -231,12 +223,31 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             backgroundColor: 'rgba(0,0,0,0.01)'
           }}
         >
-          <span>PRIVILEGE_LEVEL: LEVEL_01_ADMINISTRATOR // CONSOLE: ONLINE</span>
-          <span>SYSTEM_HEALTH: OPTIMAL</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* Mobile Sidebar Toggle Hamburger */}
+            <button 
+              className="admin-mobile-toggle"
+              onClick={() => { Sound.playClick(); setIsSidebarOpen(!isSidebarOpen); }}
+              style={{
+                display: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--nier-text)',
+                padding: '4px'
+              }}
+            >
+              {isSidebarOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+            <span>PRIVILEGE_LEVEL: LEVEL_01_ADMINISTRATOR // CONSOLE: ONLINE</span>
+          </div>
+          <span className="admin-mobile-hide">SYSTEM_HEALTH: OPTIMAL</span>
         </div>
 
         {/* Panel Main Area */}
-        <div style={{ flex: 1, padding: '30px', overflowY: 'auto' }}>
+        <div className="admin-panel-padding" style={{ flex: 1, padding: '30px', overflowY: 'auto' }}>
           {children}
         </div>
       </div>

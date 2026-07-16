@@ -47,7 +47,7 @@ export const Logs: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
       {/* Header controls bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--nier-border)', paddingBottom: '12px' }}>
+      <div className="admin-header-bar">
         <h2 style={{ fontSize: '18px', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Terminal size={18} /> [ SYSTEM DIAGNOSTIC TRANSMISSION LOGS ]
         </h2>

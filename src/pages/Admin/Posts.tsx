@@ -340,7 +340,7 @@ export const Posts: React.FC = () => {
       {view === 'list' && (
         <>
           {/* Header controls bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--nier-border)', paddingBottom: '12px' }}>
+          <div className="admin-header-bar">
             <h2 style={{ fontSize: '18px', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Archive size={18} /> [ RECORDS ARCHIVE REGISTRY ]
             </h2>
@@ -550,7 +550,7 @@ export const Posts: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
           {/* Editor Header Nav */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--nier-border)', paddingBottom: '12px' }}>
+          <div className="admin-header-bar">
             <h2 style={{ fontSize: '18px', margin: 0, fontFamily: 'var(--font-mono)' }}>
               {activePost ? `[ MODIFY RECORD // ${activePost.id.toUpperCase()} ]` : '[ COMPOSE NEW DATABASE RECORD ]'}
             </h2>
@@ -570,7 +570,7 @@ export const Posts: React.FC = () => {
           </div>
 
           {/* Input Form Grids */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '30px' }}>
+          <div className="admin-dashboard-grid">
             
             {/* Left Inputs */}
             <div className="nier-panel" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>

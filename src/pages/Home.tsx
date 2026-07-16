@@ -40,7 +40,7 @@ export const Home: React.FC = () => {
       </div>
 
       {/* Main Grid Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 2fr', gap: '30px' }}>
+      <div className="home-grid">
         
         {/* Left Side: Avatar and Quick Stats */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -178,7 +178,7 @@ export const Home: React.FC = () => {
 
             <div className="nier-double-line" />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            <div className="objectives-grid">
               <div className="nier-panel" style={{ backgroundColor: 'rgba(0,0,0,0.02)', padding: '12px' }}>
                 <h4 style={{ fontSize: '13px', marginBottom: '6px', color: 'var(--nier-accent)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Binary size={14} /> ACTIVE OBJECTIVES

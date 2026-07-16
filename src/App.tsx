@@ -1,7 +1,7 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { BootScreen } from './components/BootScreen';
 import { Sound } from './components/SoundController';
-import { Volume2, VolumeX, Sun, Moon } from 'lucide-react';
+import { Volume2, VolumeX, Sun, Moon, Menu, X } from 'lucide-react';
 
 // Admin layout / wrapper components imported statically
 import { ProtectedRoute } from './middleware/ProtectedRoute';
@@ -43,6 +43,7 @@ export const App: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const [isAdminMode, setIsAdminMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Load configuration and start clock & hash routing
   useEffect(() => {
@@ -163,6 +164,7 @@ export const App: React.FC = () => {
 
   const handleTabClick = (tab: Tab) => {
     Sound.playClick();
+    setIsMenuOpen(false);
     window.location.hash = '#' + tab;
   };
 
@@ -258,15 +260,7 @@ export const App: React.FC = () => {
         <div className="app-container">
           
           {/* Horizontal Navigation Header */}
-          <header 
-            style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              borderBottom: '2px solid var(--nier-border)',
-              paddingBottom: '15px'
-            }}
-          >
+          <header className="public-header">
             {/* Logo Brand */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
               <span style={{ fontSize: '20px', fontWeight: 'bold', letterSpacing: '0.15em', fontFamily: 'var(--font-mono)' }} className="glitch-hover">
@@ -278,7 +272,7 @@ export const App: React.FC = () => {
             </div>
 
             {/* Nav Tabs */}
-            <nav style={{ display: 'flex', gap: '8px' }}>
+            <nav className={`public-nav ${isMenuOpen ? 'open' : ''}`}>
               {(['home', 'art', 'blog', 'system'] as Tab[]).map((tab, idx) => {
                 const active = activeTab === tab;
                 const formattedName = `[ 0${idx + 1}_${tab.toUpperCase()} ]`;
@@ -302,7 +296,7 @@ export const App: React.FC = () => {
             </nav>
 
             {/* Quick settings toolbar */}
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div className="public-header-toolbar">
               {/* Theme toggle */}
               <button
                 className={`nier-btn small ${isDark ? 'active' : ''}`}
@@ -322,6 +316,25 @@ export const App: React.FC = () => {
                 style={{ padding: '6px 10px' }}
               >
                 {soundMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+              </button>
+              {/* Hamburger toggle button on mobile */}
+              <button 
+                className="public-mobile-toggle"
+                onClick={() => { Sound.playClick(); setIsMenuOpen(!isMenuOpen); }}
+                onMouseEnter={handleTabHover}
+                title={isMenuOpen ? "Close menu" : "Open menu"}
+                style={{
+                  display: 'none',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'none',
+                  border: '1px solid var(--nier-border)',
+                  cursor: 'pointer',
+                  color: 'var(--nier-text)',
+                  padding: '6px 10px'
+                }}
+              >
+                {isMenuOpen ? <X size={14} /> : <Menu size={14} />}
               </button>
             </div>
           </header>

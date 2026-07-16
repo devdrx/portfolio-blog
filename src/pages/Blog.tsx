@@ -152,7 +152,7 @@ export const Blog: React.FC = () => {
       </div>
 
       {/* READ RECORDS INTERFACE */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2.2fr', gap: '30px' }}>
+      <div className="blog-grid">
         
         {/* Post Selection Side panel */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
