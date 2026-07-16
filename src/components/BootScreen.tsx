@@ -175,7 +175,8 @@ export const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
                 padding: '12px 30px', 
                 fontSize: '14px', 
                 color: '#d1cdbc',
-                borderColor: '#8c887a' 
+                borderColor: '#8c887a',
+                whiteSpace: 'nowrap'
               }}
             >
               [ INITIATE CONNECTION ]

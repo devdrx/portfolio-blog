@@ -293,13 +293,35 @@ export const App: React.FC = () => {
                   </button>
                 );
               })}
+
+              {/* Mobile Quick settings row */}
+              <div className="public-mobile-settings-row">
+                <button
+                  className={`nier-btn small ${isDark ? 'active' : ''}`}
+                  onClick={handleThemeToggle}
+                  onMouseEnter={handleTabHover}
+                  style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '10px' }}
+                >
+                  {isDark ? <Sun size={14} /> : <Moon size={14} />} 
+                  <span>{isDark ? 'LIGHT MODE' : 'DARK MODE'}</span>
+                </button>
+                <button
+                  className="nier-btn small"
+                  onClick={handleToggleMute}
+                  onMouseEnter={handleTabHover}
+                  style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '10px' }}
+                >
+                  {soundMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                  <span>{soundMuted ? 'UNMUTE AUDIO' : 'MUTE AUDIO'}</span>
+                </button>
+              </div>
             </nav>
 
             {/* Quick settings toolbar */}
             <div className="public-header-toolbar">
               {/* Theme toggle */}
               <button
-                className={`nier-btn small ${isDark ? 'active' : ''}`}
+                className={`nier-btn small desktop-only-btn ${isDark ? 'active' : ''}`}
                 onClick={handleThemeToggle}
                 onMouseEnter={handleTabHover}
                 title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -309,7 +331,7 @@ export const App: React.FC = () => {
               </button>
               {/* Quick volume controller */}
               <button 
-                className="nier-btn small" 
+                className="nier-btn small desktop-only-btn" 
                 onClick={handleToggleMute} 
                 onMouseEnter={handleTabHover}
                 title={soundMuted ? "Unmute sounds" : "Mute sounds"}
@@ -340,9 +362,11 @@ export const App: React.FC = () => {
           </header>
 
           {/* Dynamic sub-header line */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontFamily: 'var(--font-mono)', padding: '4px 0', color: 'var(--nier-text-muted)', borderBottom: '1px solid var(--nier-border-muted)' }}>
-            <span>MODULE_LOCATION: {window.location.hostname.replace('.onrender.com', '').toUpperCase()}://portfolio-blog/{activeTab}</span>
-            <span>YoRHa NETWORK STATUS: DECRYPTED</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', fontFamily: 'var(--font-mono)', padding: '4px 0', color: 'var(--nier-text-muted)', borderBottom: '1px solid var(--nier-border-muted)', gap: '12px', overflow: 'hidden' }}>
+            <div className="status-marquee-wrapper">
+              <span className="status-marquee-text">MODULE_LOCATION: {window.location.hostname.replace('.onrender.com', '').toUpperCase()}://portfolio-blog/{activeTab}</span>
+            </div>
+            <span style={{ whiteSpace: 'nowrap', flexShrink: 0, color: 'var(--nier-accent)' }}>YoRHa NETWORK STATUS: DECRYPTED</span>
           </div>
 
           {/* Content Body View */}

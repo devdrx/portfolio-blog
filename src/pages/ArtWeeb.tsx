@@ -491,6 +491,7 @@ export const ArtWeeb: React.FC = () => {
                         setCurrentWallpaperIdx(prev => (prev - 1 + wallpapers.length) % wallpapers.length);
                       }}
                       onMouseEnter={() => Sound.playHover()}
+                      className="carousel-flank"
                       style={{
                         width: '18%',
                         height: '75%',
@@ -524,6 +525,7 @@ export const ArtWeeb: React.FC = () => {
                         setIsZoomOpen(true);
                       }}
                       onMouseEnter={() => Sound.playHover()}
+                      className="carousel-active-card glitch-hover"
                       style={{
                         width: '56%',
                         height: '100%',
@@ -535,7 +537,6 @@ export const ArtWeeb: React.FC = () => {
                         position: 'relative',
                         transition: 'all 0.3s ease'
                       }}
-                      className="glitch-hover"
                     >
                       {!wallpapers[currentWallpaperIdx]?.thumbnail ? (
                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', color: 'var(--nier-text-muted)', fontSize: '10px', fontFamily: 'var(--font-mono)' }}>
@@ -590,6 +591,7 @@ export const ArtWeeb: React.FC = () => {
                         setCurrentWallpaperIdx(prev => (prev + 1) % wallpapers.length);
                       }}
                       onMouseEnter={() => Sound.playHover()}
+                      className="carousel-flank"
                       style={{
                         width: '18%',
                         height: '75%',

@@ -80,7 +80,7 @@ export const SystemSettings: React.FC = () => {
         <span className="tag">YoRHa OS v1.0.4</span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '30px' }}>
+      <div className="settings-grid">
         
         {/* Left Side: System Options */}
         <div className="nier-panel" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -91,7 +91,7 @@ export const SystemSettings: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontSize: '14px' }}>
 
             {/* Scanlines Select */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <div>
                 <strong>SCREEN_SCANLINES:</strong>
                 <div style={{ fontSize: '11px', color: 'var(--nier-text-muted)' }}>Toggles the pixelated vertical scan overlays.</div>
@@ -143,7 +143,7 @@ export const SystemSettings: React.FC = () => {
               SYNTHESIZER AUDIO CORE
             </h3>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <div>
                 <strong>AUDIO_SYNTHESIS:</strong>
               </div>

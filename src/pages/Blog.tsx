@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Sound } from '../components/SoundController';
 import { postsService } from '../services/posts';
 import type { BlogPost } from '../services/posts';
-import { BookOpen, Settings, Clock } from 'lucide-react';
+import { BookOpen, Settings, Clock, ChevronRight } from 'lucide-react';
 import { marked } from 'marked';
 import katex from 'katex';
 import hljs from 'highlight.js';
@@ -86,6 +86,19 @@ export const renderMarkdownToHtml = (markdown: string): string => {
   return marked.parse(preprocessed, { async: false }) as string;
 };
 
+// Simple media query hook
+const useIsMobile = (breakpoint = 992) => {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth <= breakpoint : false
+  );
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= breakpoint);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [breakpoint]);
+  return isMobile;
+};
+
 export const Blog: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [activePostId, setActivePostId] = useState<string | null>(null);
@@ -97,6 +110,14 @@ export const Blog: React.FC = () => {
   // Search and Category states
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
+
+  // Mobile drawer state
+  const isMobile = useIsMobile();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const touchStartXRef = useRef(0);
+  const touchCurrentXRef = useRef(0);
+  const isDraggingRef = useRef(false);
 
   // Initial load
   useEffect(() => {
@@ -113,6 +134,7 @@ export const Blog: React.FC = () => {
   const selectPost = (postId: string) => {
     Sound.playClick();
     setActivePostId(postId);
+    if (isMobile) setDrawerOpen(false);
   };
 
   const getFontSizeStyle = () => {
@@ -140,6 +162,146 @@ export const Blog: React.FC = () => {
 
   const activePost = posts.find(p => p.id === activePostId);
 
+  // Touch drag handlers for the drawer
+  const DRAWER_WIDTH = 280;
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchCurrentXRef.current = e.touches[0].clientX;
+    isDraggingRef.current = true;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDraggingRef.current || !drawerRef.current) return;
+    touchCurrentXRef.current = e.touches[0].clientX;
+    const delta = touchCurrentXRef.current - touchStartXRef.current;
+
+    if (drawerOpen) {
+      // Dragging to close (swipe left)
+      const clampedX = Math.min(0, Math.max(-DRAWER_WIDTH, delta));
+      drawerRef.current.style.transition = 'none';
+      drawerRef.current.style.transform = `translateX(${clampedX}px)`;
+    } else {
+      // Dragging to open (swipe right)
+      const clampedX = Math.max(0, Math.min(DRAWER_WIDTH, delta));
+      drawerRef.current.style.transition = 'none';
+      drawerRef.current.style.transform = `translateX(${-DRAWER_WIDTH + clampedX}px)`;
+    }
+  }, [drawerOpen]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isDraggingRef.current || !drawerRef.current) return;
+    isDraggingRef.current = false;
+    const delta = touchCurrentXRef.current - touchStartXRef.current;
+    drawerRef.current.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+
+    if (drawerOpen) {
+      // If swiped left more than 80px, close
+      if (delta < -80) {
+        setDrawerOpen(false);
+        drawerRef.current.style.transform = `translateX(-${DRAWER_WIDTH}px)`;
+      } else {
+        drawerRef.current.style.transform = 'translateX(0)';
+      }
+    } else {
+      // If swiped right more than 80px, open
+      if (delta > 80) {
+        setDrawerOpen(true);
+        drawerRef.current.style.transform = 'translateX(0)';
+      } else {
+        drawerRef.current.style.transform = `translateX(-${DRAWER_WIDTH}px)`;
+      }
+    }
+  }, [drawerOpen]);
+
+  // Sync drawer transform with state changes
+  useEffect(() => {
+    if (!drawerRef.current || !isMobile) return;
+    drawerRef.current.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+    drawerRef.current.style.transform = drawerOpen ? 'translateX(0)' : `translateX(-${DRAWER_WIDTH}px)`;
+  }, [drawerOpen, isMobile]);
+
+  // Archive index content (shared between desktop and mobile drawer)
+  const archiveIndexContent = (
+    <div className="nier-panel" style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: isMobile ? 'none' : '580px', height: isMobile ? '100%' : undefined }}>
+      <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--nier-border-muted)', paddingBottom: '6px', margin: 0 }}>ARCHIVE INDEX</h3>
+      
+      {/* Filter inputs */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <input 
+          type="text"
+          placeholder="SEARCH MODULES..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            backgroundColor: 'var(--nier-bg)',
+            border: '1px solid var(--nier-border)',
+            color: 'var(--nier-text)',
+            padding: '6px 10px',
+            fontSize: '11px',
+            fontFamily: 'var(--font-mono)',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}
+        />
+        
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>
+          {['ALL', 'SOFTWARE', 'ALGORITHMS', 'ART & CULTURE', 'SYSTEMS'].map(cat => (
+            <button
+              key={cat}
+              onClick={() => { Sound.playHover(); setSelectedCategoryFilter(cat); }}
+              style={{
+                border: '1px solid var(--nier-border-muted)',
+                background: selectedCategoryFilter === cat ? 'var(--nier-text)' : 'transparent',
+                color: selectedCategoryFilter === cat ? 'var(--nier-bg)' : 'var(--nier-text)',
+                padding: '2px 6px',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                fontSize: '8px'
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Scrollable list */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', flex: '1', paddingRight: '4px' }}>
+        {filteredPosts.length > 0 ? filteredPosts.map((post) => (
+          <div
+            key={post.id}
+            onClick={() => selectPost(post.id)}
+            style={{
+              border: activePostId === post.id ? '2px solid var(--nier-text)' : '1px solid var(--nier-border-muted)',
+              padding: '10px',
+              cursor: 'pointer',
+              backgroundColor: activePostId === post.id ? 'rgba(78,75,66,0.05)' : 'transparent',
+            }}
+            className="glitch-hover"
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--nier-text-muted)', marginBottom: '4px' }}>
+              <span>[{post.category}]</span>
+              <span>{post.date}</span>
+            </div>
+            <div style={{ fontSize: '13px', fontWeight: 'bold', lineHeight: '1.3' }}>
+              {post.title}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+              <span style={{ fontSize: '10px', color: 'var(--nier-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Clock size={10} /> {post.readTime}
+              </span>
+            </div>
+          </div>
+        )) : (
+          <p style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--nier-text-muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
+            NO COMPATIBLE LOGS LOCATED
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="content-section" style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
       
@@ -151,89 +313,118 @@ export const Blog: React.FC = () => {
         <span className="tag">{posts.length} RECORDS</span>
       </div>
 
+      {/* Mobile: Archive drawer toggle button */}
+      {isMobile && (
+        <button
+          className="nier-btn small"
+          onClick={() => { Sound.playClick(); setDrawerOpen(true); }}
+          style={{ alignSelf: 'flex-start', fontSize: '11px' }}
+        >
+          <BookOpen size={12} /> OPEN ARCHIVE INDEX
+        </button>
+      )}
+
+      {/* Mobile: Swipeable drawer overlay */}
+      {isMobile && (
+        <>
+          {/* Backdrop */}
+          {drawerOpen && (
+            <div
+              onClick={() => setDrawerOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                zIndex: 998,
+                transition: 'opacity 0.3s ease',
+              }}
+            />
+          )}
+          {/* Drawer panel */}
+          <div
+            ref={drawerRef}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: `${DRAWER_WIDTH}px`,
+              height: '100vh',
+              backgroundColor: 'var(--nier-bg)',
+              borderRight: '2px solid var(--nier-border)',
+              zIndex: 999,
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '20px 15px',
+              transform: `translateX(-${DRAWER_WIDTH}px)`,
+              transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+              overflowY: 'auto',
+              boxShadow: drawerOpen ? '4px 0 20px rgba(0,0,0,0.3)' : 'none',
+            }}
+          >
+            {/* Drawer close handle */}
+            <button
+              onClick={() => setDrawerOpen(false)}
+              style={{
+                alignSelf: 'flex-end',
+                background: 'transparent',
+                border: '1px solid var(--nier-border-muted)',
+                color: 'var(--nier-text-muted)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '10px',
+                padding: '4px 8px',
+                cursor: 'pointer',
+                marginBottom: '12px',
+              }}
+            >
+              [ CLOSE ]
+            </button>
+            {archiveIndexContent}
+
+            {/* Drag handle tab on right edge */}
+            <div
+              style={{
+                position: 'absolute',
+                right: '-28px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '28px',
+                height: '64px',
+                backgroundColor: 'var(--nier-bg-alt)',
+                border: '1px solid var(--nier-border)',
+                borderLeft: 'none',
+                borderRadius: '0 6px 6px 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+              onClick={() => { Sound.playClick(); setDrawerOpen(!drawerOpen); }}
+            >
+              <ChevronRight
+                size={16}
+                style={{
+                  color: 'var(--nier-text-muted)',
+                  transform: drawerOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.3s ease',
+                }}
+              />
+            </div>
+          </div>
+        </>
+      )}
+
       {/* READ RECORDS INTERFACE */}
       <div className="blog-grid">
         
-        {/* Post Selection Side panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <div className="nier-panel" style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '580px' }}>
-            <h3 style={{ fontSize: '14px', borderBottom: '1px solid var(--nier-border-muted)', paddingBottom: '6px', margin: 0 }}>ARCHIVE INDEX</h3>
-            
-            {/* Filter inputs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <input 
-                type="text"
-                placeholder="SEARCH MODULES..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  backgroundColor: 'var(--nier-bg)',
-                  border: '1px solid var(--nier-border)',
-                  color: 'var(--nier-text)',
-                  padding: '6px 10px',
-                  fontSize: '11px',
-                  fontFamily: 'var(--font-mono)',
-                  width: '100%',
-                  boxSizing: 'border-box'
-                }}
-              />
-              
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', fontSize: '9px', fontFamily: 'var(--font-mono)' }}>
-                {['ALL', 'SOFTWARE', 'ALGORITHMS', 'ART & CULTURE', 'SYSTEMS'].map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => { Sound.playHover(); setSelectedCategoryFilter(cat); }}
-                    style={{
-                      border: '1px solid var(--nier-border-muted)',
-                      background: selectedCategoryFilter === cat ? 'var(--nier-text)' : 'transparent',
-                      color: selectedCategoryFilter === cat ? 'var(--nier-bg)' : 'var(--nier-text)',
-                      padding: '2px 6px',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      fontSize: '8px'
-                    }}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Scrollable list */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', flex: '1', paddingRight: '4px' }}>
-              {filteredPosts.length > 0 ? filteredPosts.map((post) => (
-                <div
-                  key={post.id}
-                  onClick={() => selectPost(post.id)}
-                  style={{
-                    border: activePostId === post.id ? '2px solid var(--nier-text)' : '1px solid var(--nier-border-muted)',
-                    padding: '10px',
-                    cursor: 'pointer',
-                    backgroundColor: activePostId === post.id ? 'rgba(78,75,66,0.05)' : 'transparent',
-                  }}
-                  className="glitch-hover"
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--nier-text-muted)', marginBottom: '4px' }}>
-                    <span>[{post.category}]</span>
-                    <span>{post.date}</span>
-                  </div>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold', lineHeight: '1.3' }}>
-                    {post.title}
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                    <span style={{ fontSize: '10px', color: 'var(--nier-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Clock size={10} /> {post.readTime}
-                    </span>
-                  </div>
-                </div>
-              )) : (
-                <p style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--nier-text-muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
-                  NO COMPATIBLE LOGS LOCATED
-                </p>
-              )}
-            </div>
+        {/* Post Selection Side panel (desktop only) */}
+        {!isMobile && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            {archiveIndexContent}
           </div>
-        </div>
+        )}
 
         {/* Reader Panel */}
         <div className="nier-panel" style={{ display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
@@ -241,7 +432,7 @@ export const Blog: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', flex: '1' }}>
               
               {/* Reading settings options */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.03)', padding: '6px 12px', borderBottom: '1px solid var(--nier-border-muted)', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.03)', padding: '6px 12px', borderBottom: '1px solid var(--nier-border-muted)', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                   <Settings size={12} style={{ color: 'var(--nier-text-muted)' }} />
                   <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--nier-text-muted)' }}>VIEW_OPT:</span>

@@ -202,6 +202,7 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   gap: 8px;
   text-decoration: none;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .nier-btn::before {
@@ -476,6 +477,16 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   margin-bottom: 40px;
   align-self: center;
   animation: logo-flicker 1.5s infinite;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .boot-logo {
+    font-size: 18px !important;
+    letter-spacing: 0.1em !important;
+    padding: 8px 16px !important;
+  }
 }
 
 @keyframes logo-flicker {
@@ -748,6 +759,12 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   opacity: 0.15;
 }
 
+@media (max-width: 576px) {
+  .arrow-chain {
+    display: none !important;
+  }
+}
+
 /* Blinking terminal cursor */
 @keyframes cursor-blink {
   0%, 100% {
@@ -790,6 +807,9 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   gap: 8px;
   align-items: center;
 }
+.public-mobile-settings-row {
+  display: none;
+}
 
 @media (max-width: 992px) {
   .public-nav {
@@ -810,6 +830,64 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   .public-mobile-toggle {
     display: flex !important;
   }
+  .public-mobile-settings-row {
+    display: flex !important;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .desktop-only-btn {
+    display: none !important;
+  }
+}
+
+/* --- Public Title Decorator & Concept Gallery --- */
+@media (max-width: 768px) {
+  .title-decorator {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .title-decorator h2 {
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+  }
+  .title-decorator .line {
+    display: none !important;
+  }
+  
+  .carousel-flank {
+    display: none !important;
+  }
+  .carousel-active-card {
+    width: 100% !important;
+  }
+}
+
+/* --- Status bar marquee (MODULE_LOCATION) --- */
+.status-marquee-wrapper {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+.status-marquee-text {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 992px) {
+  .status-marquee-wrapper {
+    max-width: 55%;
+  }
+  .status-marquee-text {
+    display: inline-block;
+    text-overflow: clip;
+    animation: marquee-scroll 12s linear infinite;
+  }
+}
+@keyframes marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-60%); }
 }
 
 /* --- Public Footer --- */
@@ -896,12 +974,13 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
 /* --- System Settings Page --- */
 .settings-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 30px;
 }
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .settings-grid {
     grid-template-columns: 1fr !important;
+    gap: 20px !important;
   }
 }
 
