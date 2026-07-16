@@ -3,7 +3,7 @@ import { GlitchText } from '../components/GlitchText';
 import { Sound } from '../components/SoundController';
 import { projectsService } from '../services/projects';
 import type { Project } from '../services/projects';
-import { Terminal, Cpu, ShieldAlert, Binary, ShieldCheck } from 'lucide-react';
+import { Terminal, Cpu, Binary, ShieldCheck } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
