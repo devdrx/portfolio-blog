@@ -3,7 +3,7 @@ import { GlitchText } from '../components/GlitchText';
 import { Sound } from '../components/SoundController';
 import { projectsService } from '../services/projects';
 import type { Project } from '../services/projects';
-import { Terminal, Cpu, ShieldAlert, Binary } from 'lucide-react';
+import { Terminal, Cpu, ShieldAlert, Binary, ShieldCheck } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -184,20 +184,20 @@ export const Home: React.FC = () => {
                   <Binary size={14} /> ACTIVE OBJECTIVES
                 </h4>
                 <ul style={{ fontSize: '12px', paddingLeft: '15px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <li>Build flawless, responsive web structures</li>
-                  <li>Develop rich code highlighting capabilities</li>
-                  <li>Collect and display aesthetic digital art pieces</li>
+                  <li>Deploy MediSense TensorFlow diagnostic models</li>
+                  <li>Scale CP-Helper platform to 1,000+ active users</li>
+                  <li>Train local LLMs for grievance classification</li>
                 </ul>
               </div>
 
               <div className="nier-panel" style={{ backgroundColor: 'rgba(0,0,0,0.02)', padding: '12px' }}>
-                <h4 style={{ fontSize: '13px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ShieldAlert size={14} /> COMPILER WARNINGS
+                <h4 style={{ fontSize: '13px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--nier-text)' }}>
+                  <ShieldCheck size={14} style={{ color: 'var(--nier-text)' }} /> SYSTEM DIAGNOSTICS
                 </h4>
-                <div style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
-                  <div>&gt; Deprecated coffee dependencies found.</div>
-                  <div>&gt; Weeb levels approaching peak capacity.</div>
-                  <div>&gt; Sleep reserves critical (3.2%).</div>
+                <div style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div>&gt; Academic Core: IIIT Lucknow CS (9.02 CGPA)</div>
+                  <div>&gt; Algorithmic Rating: CF Specialist (1491 max)</div>
+                  <div>&gt; Hackathon Payload: Hackofiesta 6.0 Winner</div>
                 </div>
               </div>
             </div>
