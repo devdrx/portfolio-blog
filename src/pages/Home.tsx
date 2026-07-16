@@ -160,8 +160,9 @@ export const Home: React.FC = () => {
           {/* Main Bio / Overview */}
           <div className="nier-panel" style={{ flex: '1' }}>
             <div className="nier-header-line" />
-            <h3 style={{ fontSize: '18px', marginBottom: '12px' }}>
+            <h3 style={{ fontSize: '18px', marginBottom: '12px', display: 'flex', alignItems: 'center' }}>
               <GlitchText text="&gt; OPERATOR LOG // MISSION PROFILE" speed={30} />
+              <span className="nier-cursor" />
             </h3>
             
             <p style={{ marginBottom: '15px', color: 'var(--nier-text)', fontSize: '14px', textAlign: 'justify' }}>

@@ -679,6 +679,16 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   text-decoration-color: var(--nier-link);
 }
 
+.blog-content ol,
+.blog-content ul {
+  padding-left: 24px;
+  margin: 14px 0;
+}
+
+.blog-content li {
+  margin-bottom: 6px;
+}
+
 /* NieR styled range slider */
 .nier-slider {
   -webkit-appearance: none;
@@ -709,5 +719,52 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   border: 1px solid var(--nier-border);
   cursor: pointer;
   border-radius: 0;
+}
+
+/* Boot screen connection arrow indication animation */
+@keyframes arrow-cycle {
+  0%, 100% {
+    opacity: 0.15;
+    color: #8c887a;
+  }
+  30%, 70% {
+    opacity: 1;
+    color: #d1cdbc;
+  }
+}
+
+.arrow-chain {
+  display: flex;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: bold;
+  user-select: none;
+  align-items: center;
+}
+
+.arrow-chain .arrow {
+  animation: arrow-cycle 1.4s infinite;
+  opacity: 0.15;
+}
+
+/* Blinking terminal cursor */
+@keyframes cursor-blink {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.nier-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background-color: var(--nier-text);
+  margin-left: 6px;
+  vertical-align: middle;
+  animation: cursor-blink 1s step-end infinite;
 }
 

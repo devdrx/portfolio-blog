@@ -1032,10 +1032,6 @@ export const ArtWeeb: React.FC = () => {
                     );
                   })}
                 </div>
-                
-                <div style={{ fontSize: '10px', color: 'var(--nier-text-muted)', fontStyle: 'italic', textAlign: 'center', borderTop: '1px solid var(--nier-border-muted)', paddingTop: '8px' }}>
-                  *Place any MP3/WAV file in public/songs/ to load it dynamically into the Jukebox.
-                </div>
               </div>
             )}
           </div>

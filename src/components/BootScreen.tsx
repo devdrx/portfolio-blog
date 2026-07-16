@@ -42,6 +42,12 @@ export const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<'text' | 'bar' | 'complete'>('text');
 
+  // Load local storage typewriter speed configuration (default is 40)
+  const savedSpeed = typeof window !== 'undefined' ? localStorage.getItem('yorha_typewriter_speed') : null;
+  const speedVal = savedSpeed ? parseInt(savedSpeed, 10) : 40;
+  const logInterval = speedVal * 4.5;
+  const barInterval = speedVal * 3;
+
   const onCompleteRef = useRef(onComplete);
   useEffect(() => {
     onCompleteRef.current = onComplete;
@@ -72,10 +78,10 @@ export const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
           return prev;
         }
       });
-    }, 180);
+    }, logInterval);
 
     return () => clearInterval(interval);
-  }, [bootStarted]);
+  }, [bootStarted, logInterval]);
 
   // Trigger load progress bar
   useEffect(() => {
@@ -93,10 +99,10 @@ export const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
           return 100;
         }
       });
-    }, 120);
+    }, barInterval);
 
     return () => clearInterval(interval);
-  }, [phase]);
+  }, [phase, barInterval]);
 
   // Complete boot
   useEffect(() => {
@@ -153,18 +159,36 @@ export const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
 
           <div className="nier-double-line" style={{ width: '100%', borderColor: '#8c887a' }} />
 
-          <button 
-            className="nier-btn" 
-            onClick={handleStartBoot}
-            style={{ 
-              padding: '12px 30px', 
-              fontSize: '14px', 
-              color: '#d1cdbc',
-              borderColor: '#8c887a' 
-            }}
-          >
-            [ INITIATE CONNECTION ]
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', margin: '15px 0' }}>
+            {/* Left Arrowheads pointing right (towards button) */}
+            <div className="arrow-chain">
+              <span className="arrow" style={{ animationDelay: '0.0s' }}>&gt;</span>
+              <span className="arrow" style={{ animationDelay: '0.2s' }}>&gt;</span>
+              <span className="arrow" style={{ animationDelay: '0.4s' }}>&gt;</span>
+              <span className="arrow" style={{ animationDelay: '0.6s' }}>&gt;</span>
+            </div>
+
+            <button 
+              className="nier-btn" 
+              onClick={handleStartBoot}
+              style={{ 
+                padding: '12px 30px', 
+                fontSize: '14px', 
+                color: '#d1cdbc',
+                borderColor: '#8c887a' 
+              }}
+            >
+              [ INITIATE CONNECTION ]
+            </button>
+
+            {/* Right Arrowheads pointing left (towards button) */}
+            <div className="arrow-chain">
+              <span className="arrow" style={{ animationDelay: '0.6s' }}>&lt;</span>
+              <span className="arrow" style={{ animationDelay: '0.4s' }}>&lt;</span>
+              <span className="arrow" style={{ animationDelay: '0.2s' }}>&lt;</span>
+              <span className="arrow" style={{ animationDelay: '0.0s' }}>&lt;</span>
+            </div>
+          </div>
         </div>
       </div>
     );

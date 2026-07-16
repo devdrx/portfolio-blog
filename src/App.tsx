@@ -1,6 +1,5 @@
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { BootScreen } from './components/BootScreen';
-import { AirlockTransition } from './components/AirlockTransition';
 import { Sound } from './components/SoundController';
 import { Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 
@@ -8,11 +7,21 @@ import { Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 import { ProtectedRoute } from './middleware/ProtectedRoute';
 import { AdminLayout } from './components/admin/AdminLayout';
 
-// Lazily load route views for chunk code splitting
-const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
-const ArtWeeb = lazy(() => import('./pages/ArtWeeb').then(m => ({ default: m.ArtWeeb })));
-const Blog = lazy(() => import('./pages/Blog').then(m => ({ default: m.Blog })));
-const SystemSettings = lazy(() => import('./pages/SystemSettings').then(m => ({ default: m.SystemSettings })));
+// Injected during build by Vite config
+declare const __COMMIT_HASH__: string;
+
+// Lazily load route views for chunk code splitting, preloading them eagerly in the background during boot sequence
+const HomePromise = import('./pages/Home').then(m => ({ default: m.Home }));
+const Home = lazy(() => HomePromise);
+
+const ArtPromise = import('./pages/ArtWeeb').then(m => ({ default: m.ArtWeeb }));
+const ArtWeeb = lazy(() => ArtPromise);
+
+const BlogPromise = import('./pages/Blog').then(m => ({ default: m.Blog }));
+const Blog = lazy(() => BlogPromise);
+
+const SystemPromise = import('./pages/SystemSettings').then(m => ({ default: m.SystemSettings }));
+const SystemSettings = lazy(() => SystemPromise);
 
 // Admin views
 const Login = lazy(() => import('./pages/Admin/Login').then(m => ({ default: m.Login })));
@@ -25,7 +34,7 @@ const Logs = lazy(() => import('./pages/Admin/Logs').then(m => ({ default: m.Log
 
 type Tab = 'home' | 'art' | 'blog' | 'system';
 
-type AppPhase = 'boot' | 'airlock' | 'app';
+type AppPhase = 'boot' | 'app';
 
 export const App: React.FC = () => {
   const [appPhase, setAppPhase] = useState<AppPhase>('boot');
@@ -228,11 +237,8 @@ export const App: React.FC = () => {
   }, [appPhase]);
 
   if (appPhase === 'boot') {
-    return <BootScreen onComplete={() => setAppPhase('airlock')} />;
+    return <BootScreen onComplete={() => setAppPhase('app')} />;
   }
-
-  // Determine if this is a repeat visit within the same session
-  const isShortMode = sessionStorage.getItem('yorha_airlock_seen') === 'true';
 
   const appShell = (
     <>
@@ -322,7 +328,7 @@ export const App: React.FC = () => {
 
           {/* Dynamic sub-header line */}
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontFamily: 'var(--font-mono)', padding: '4px 0', color: 'var(--nier-text-muted)', borderBottom: '1px solid var(--nier-border-muted)' }}>
-            <span>MODULE_LOCATION: localhost/portfolio-blog/{activeTab}</span>
+            <span>MODULE_LOCATION: {window.location.hostname.replace('.onrender.com', '').toUpperCase()}://portfolio-blog/{activeTab}</span>
             <span>YoRHa NETWORK STATUS: DECRYPTED</span>
           </div>
 
@@ -348,7 +354,20 @@ export const App: React.FC = () => {
             <div style={{ display: 'flex', gap: '30px' }}>
               <span>GLORY TO MANKIND</span>
               <span>SYSTEM SECURITY: NOMINAL</span>
-              <span>OS_HASH: 0x8a9cf2bc</span>
+              <a 
+                href={__COMMIT_HASH__ === 'dev-local' ? 'https://github.com/devdrx/portfolio-blog' : `https://github.com/devdrx/portfolio-blog/commit/${__COMMIT_HASH__}`}
+                target="_blank" 
+                rel="noopener noreferrer" 
+                style={{ 
+                  color: 'inherit', 
+                  textDecoration: 'underline', 
+                  textDecorationColor: 'var(--nier-border-muted)',
+                  textUnderlineOffset: '2px'
+                }}
+                title="VIEW DEPLOYED COMMIT ON GITHUB"
+              >
+                OS_HASH: 0x{__COMMIT_HASH__}
+              </a>
             </div>
 
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
@@ -367,21 +386,7 @@ export const App: React.FC = () => {
       )}
     </>
   );
-
-  if (appPhase === 'airlock') {
-    return (
-      <AirlockTransition
-        shortMode={isShortMode}
-        onComplete={() => {
-          sessionStorage.setItem('yorha_airlock_seen', 'true');
-          setAppPhase('app');
-        }}
-      >
-        {appShell}
-      </AirlockTransition>
-    );
-  }
-
+  
   return appShell;
 };
 
