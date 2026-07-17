@@ -31,6 +31,7 @@ const Projects = lazy(() => import('./pages/Admin/Projects').then(m => ({ defaul
 const Media = lazy(() => import('./pages/Admin/Media').then(m => ({ default: m.Media })));
 const Settings = lazy(() => import('./pages/Admin/Settings').then(m => ({ default: m.Settings })));
 const Logs = lazy(() => import('./pages/Admin/Logs').then(m => ({ default: m.Logs })));
+const OtakuRecords = lazy(() => import('./pages/Admin/OtakuRecords').then(m => ({ default: m.OtakuRecords })));
 
 type Tab = 'home' | 'art' | 'blog' | 'system';
 
@@ -202,9 +203,10 @@ export const App: React.FC = () => {
             return <Login />;
           }
 
-          let childPage = <Dashboard />;
+           let childPage = <Dashboard />;
           if (hash === '#/admin/posts') childPage = <Posts />;
           else if (hash === '#/admin/projects') childPage = <Projects />;
+          else if (hash === '#/admin/otaku') childPage = <OtakuRecords />;
           else if (hash === '#/admin/media') childPage = <Media />;
           else if (hash === '#/admin/settings') childPage = <Settings />;
           else if (hash === '#/admin/logs') childPage = <Logs />;

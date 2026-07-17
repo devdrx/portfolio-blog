@@ -11,7 +11,7 @@ import bcrypt from 'bcryptjs';
 import { existsSync, mkdirSync, unlinkSync, readdirSync } from 'fs';
 import { join, dirname, extname } from 'path';
 import { fileURLToPath } from 'url';
-import { Post, Project, Media, Setting, Log, Auth, seedDatabase } from './db.js';
+import { Post, Project, Media, Setting, Log, Auth, OtakuRecord, seedDatabase } from './db.js';
 import Jimp from 'jimp';
 
 dotenv.config();
@@ -254,6 +254,47 @@ app.delete('/api/media/:id', authenticate, async (req, res) => {
   }
 });
 
+// ─── OTAKU RECORDS ENDPOINTS ──────────────────────────────────────────────────
+app.get('/api/otaku', async (req, res) => {
+  try {
+    const records = await OtakuRecord.find();
+    res.json(records);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/otaku', authenticate, async (req, res) => {
+  try {
+    const newRecord = await OtakuRecord.create({
+      ...req.body,
+      _id: `otaku-${Date.now()}`
+    });
+    res.status(201).json(newRecord);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/otaku/:id', authenticate, async (req, res) => {
+  try {
+    const updated = await OtakuRecord.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ error: 'Otaku record not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/otaku/:id', authenticate, async (req, res) => {
+  try {
+    await OtakuRecord.findByIdAndDelete(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── SYSTEM LOGS ENDPOINTS ────────────────────────────────────────────────────
 app.get('/api/logs', authenticate, async (req, res) => {
   try {
@@ -376,6 +417,7 @@ app.get('/api/settings/stats', authenticate, async (req, res) => {
 
     const totalSizeKB = mediaList.reduce((acc, item) => acc + (item.size || 0), 0);
     const healthStatus = draftsCount > 5 ? 'DEGRADED (HIGH DRAFT VOLUMES)' : 'OPTIMAL';
+    const otakuRecordsCount = await OtakuRecord.countDocuments();
 
     res.json({
       postsCount: publishedCount,
@@ -384,7 +426,8 @@ app.get('/api/settings/stats', authenticate, async (req, res) => {
       mediaCount: mediaList.length,
       mediaSizeKB: Math.round(totalSizeKB),
       health: healthStatus,
-      lastBackup: settings.lastBackup
+      lastBackup: settings.lastBackup,
+      otakuCount: otakuRecordsCount
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

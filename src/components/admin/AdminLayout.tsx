@@ -12,7 +12,8 @@ import {
   Clock,
   House,
   Menu,
-  X
+  X,
+  Film
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -60,6 +61,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { label: 'DASHBOARD', hash: '#/admin', icon: LayoutDashboard },
     { label: 'POSTS ARCHIVE', hash: '#/admin/posts', icon: BookOpen },
     { label: 'PROJECT RECORDS', hash: '#/admin/projects', icon: FolderGit },
+    { label: 'OTAKU RECORDS', hash: '#/admin/otaku', icon: Film },
     { label: 'MEDIA VAULT', hash: '#/admin/media', icon: Image },
     { label: 'SYSTEM CONFIG', hash: '#/admin/settings', icon: Settings },
     { label: 'DIAGNOSTIC LOGS', hash: '#/admin/logs', icon: Terminal },

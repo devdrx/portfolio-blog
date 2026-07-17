@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { otakuService } from '../services/otaku';
+import type { OtakuRecord } from '../services/otaku';
 import { Sound } from '../components/SoundController';
 import { 
   Play, 
@@ -10,7 +12,6 @@ import {
   Volume2, 
   VolumeX, 
   Music, 
-  Star, 
   Film, 
   Eye, 
   Heart, 
@@ -97,6 +98,23 @@ export const ArtWeeb: React.FC = () => {
   const [wallpapers, setWallpapers] = useState<{ original: string; thumbnail: string }[]>([]);
   const [currentWallpaperIdx, setCurrentWallpaperIdx] = useState(0);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const [animeLogs, setAnimeLogs] = useState<OtakuRecord[]>([]);
+  const [recordsLoading, setRecordsLoading] = useState(true);
+
+  const fetchOtakuRecords = () => {
+    setRecordsLoading(true);
+    otakuService.getRecords()
+      .then((data) => {
+        setAnimeLogs(data);
+        setRecordsLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed fetching otaku records:', err);
+        setRecordsLoading(false);
+      });
+  };
 
   const fetchWallpapers = () => {
     fetch('/api/wallpapers')
@@ -112,6 +130,7 @@ export const ArtWeeb: React.FC = () => {
   useEffect(() => {
     fetchWallpapers();
     fetchSongs();
+    fetchOtakuRecords();
   }, []);
 
   // Poll wallpapers if any thumbnail is still generating (null)
@@ -166,11 +185,13 @@ export const ArtWeeb: React.FC = () => {
 
 
   // Anime Logs Data
-  const animeLogs = [
-    { title: 'Serial Experiments Lain', type: 'Anime', rating: 10, note: 'Peak cyber-punk philosophy and terminal diagnostics.', coverUrl: 'https://media.kitsu.app/anime/poster_images/306/medium.jpg' },
-    { title: 'Neon Genesis Evangelion', type: 'Anime', rating: 10, note: 'Deep psychological machinery and existential core.', coverUrl: 'https://media.kitsu.app/anime/21/poster_image/medium-d98a2928c9eda0d71f0dab72c1a0124d.jpeg' },
-    { title: 'NieR: Automata Ver1.1a', type: 'Anime', rating: 9, note: 'Gorgeous anime adaptation of the YoRHa narrative.', coverUrl: 'https://media.kitsu.app/anime/47784/poster_image/medium-87164c01153374979cbb13368c4635a1.jpeg' },
-    { title: 'Steins;Gate', type: 'Anime', rating: 9.5, note: 'Time travel, loop theories, and worldline matrices.', coverUrl: 'https://media.kitsu.app/anime/poster_images/5646/medium.jpg' }
+  const SC_RANK_COLORS = [
+    'hsl(210, 30%, 50%)',
+    'hsl(160, 28%, 44%)',
+    'hsl(38, 35%, 48%)',
+    'hsl(275, 28%, 48%)',
+    'hsl(340, 30%, 46%)',
+    'hsl(190, 32%, 42%)',
   ];
 
   const handleSongEnded = () => {
@@ -393,6 +414,22 @@ export const ArtWeeb: React.FC = () => {
     const mins = Math.floor(time / 60);
     const secs = Math.floor(time % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const renderStarBlocks = (rating: number) => {
+    const filled = Math.round(rating);
+    const empty = 10 - filled;
+    return '\u2588'.repeat(filled) + '\u2591'.repeat(empty);
+  };
+
+  const handleAnimeSelect = (idx: number) => {
+    if (idx === selectedAnimeIdx) return;
+    Sound.playClick();
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedAnimeIdx(idx);
+      setIsTransitioning(false);
+    }, 280);
   };
 
   return (
@@ -683,142 +720,244 @@ export const ArtWeeb: React.FC = () => {
               <Film size={16} /> OTAKU_DATA_RECORDS
             </h3>
 
-            <div className="jukebox-grid">
-              {/* Left Column: Anime Selection Tabs */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {animeLogs.map((log, idx) => {
-                  const active = selectedAnimeIdx === idx;
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => {
-                        Sound.playClick();
-                        setSelectedAnimeIdx(idx);
-                      }}
-                      onMouseEnter={() => {
-                        Sound.playHover();
-                      }}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '10px 12px',
-                        border: '1px solid var(--nier-border-muted)',
-                        backgroundColor: active ? 'var(--nier-text)' : 'transparent',
-                        color: active ? 'var(--nier-bg)' : 'var(--nier-text)',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '13px'
-                      }}
-                      className="glitch-hover"
-                    >
-                      <span>{String(idx + 1).padStart(2, '0')}. {log.title}</span>
-                      <span style={{ fontSize: '11px', color: active ? 'var(--nier-bg)' : 'var(--nier-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Star size={11} style={{ fill: active ? 'var(--nier-bg)' : 'var(--nier-accent)', color: active ? 'var(--nier-bg)' : 'var(--nier-accent)' }} />
-                        {log.rating}
-                      </span>
-                    </div>
-                  );
-                })}
+            {recordsLoading ? (
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '12px',
+                color: 'var(--nier-text-muted)',
+                padding: '40px 0',
+                textAlign: 'center',
+                backgroundColor: 'var(--nier-bg-alt)',
+                border: '1px dashed var(--nier-border-muted)'
+              }}>
+                &gt; LOADING OTAKU DATABASE RECORDS...
               </div>
+            ) : animeLogs.length === 0 ? (
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '12px',
+                color: 'var(--nier-text-muted)',
+                padding: '40px 0',
+                textAlign: 'center',
+                backgroundColor: 'var(--nier-bg-alt)',
+                border: '1px dashed var(--nier-border-muted)'
+              }}>
+                &gt; NO CLASSIFIED ARCHIVE RECTORIES DETECTED.
+              </div>
+            ) : (
+              <>
+                {/* Horizontal File Tabs */}
+                <div style={{ display: 'flex', gap: '4px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '4px' }}>
+                  {animeLogs.map((log, idx) => {
+                    const active = selectedAnimeIdx === idx;
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => handleAnimeSelect(idx)}
+                        onMouseEnter={() => Sound.playHover()}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          padding: '8px 14px',
+                          border: '1px solid var(--nier-border-muted)',
+                          borderTop: active ? `3px solid ${log.accentColor}` : '3px solid transparent',
+                          backgroundColor: active ? 'var(--nier-bg-alt)' : 'transparent',
+                          cursor: 'pointer',
+                          transition: 'all 0.18s ease',
+                          fontFamily: 'var(--font-mono)',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
+                          transform: active ? 'translateY(-2px)' : 'translateY(0)',
+                          boxShadow: active ? '0 2px 10px rgba(0,0,0,0.1)' : 'none',
+                        }}
+                        className="glitch-hover"
+                      >
+                        <span style={{ fontSize: '9px', color: active ? log.accentColor : 'var(--nier-text-muted)', marginBottom: '3px' }}>
+                          FILE_{String(idx + 1).padStart(2, '0')}
+                        </span>
+                        <span style={{ fontSize: '12px', color: active ? 'var(--nier-text)' : 'var(--nier-text-muted)', fontWeight: active ? 'bold' : 'normal' }}>
+                          {log.title}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
 
-              {/* Right Column: Active Anime Card */}
-              <div 
-                style={{ 
-                  border: '1px solid var(--nier-border)', 
-                  backgroundColor: 'var(--nier-bg-alt)',
-                  display: 'flex',
-                  gap: '12px',
-                  padding: '12px',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                {/* Visual scanline layer on top of preview */}
+                {/* Dossier Card */}
                 <div style={{
-                  position: 'absolute', inset: 0,
-                  background: 'linear-gradient(rgba(78,75,66,0.06) 50%, transparent 50%)',
-                  backgroundSize: '100% 3px',
-                  pointerEvents: 'none',
-                }} />
-
-                {/* Left inside card: cover image */}
-                <div style={{
-                  width: '90px',
-                  height: '130px',
-                  flexShrink: 0,
                   border: '1px solid var(--nier-border)',
-                  backgroundColor: 'rgba(0,0,0,0.05)',
+                  backgroundColor: 'var(--nier-bg-alt)',
+                  position: 'relative',
                   overflow: 'hidden',
-                  position: 'relative'
+                  minHeight: '200px',
                 }}>
-                  <img 
-                    src={animeLogs[selectedAnimeIdx].coverUrl} 
-                    alt={animeLogs[selectedAnimeIdx].title} 
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      filter: 'sepia(0.15) contrast(1.05)',
-                    }}
-                    loading="lazy"
-                  />
+                  {/* Scanline overlay */}
                   <div style={{
-                    position: 'absolute',
-                    top: 2,
-                    right: 2,
-                    backgroundColor: 'var(--nier-accent)',
-                    color: 'var(--nier-bg)',
-                    fontSize: '9px',
-                    fontFamily: 'var(--font-mono)',
-                    padding: '1px 4px'
-                  }}>
-                    {animeLogs[selectedAnimeIdx].type}
-                  </div>
-                </div>
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(rgba(78,75,66,0.06) 50%, transparent 50%)',
+                    backgroundSize: '100% 3px',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                  }} />
 
-                {/* Right inside card: comments and rating */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 0 }}>
-                  <div style={{ 
-                    fontFamily: 'var(--font-mono)', 
-                    fontSize: '14px', 
-                    fontWeight: 'bold', 
-                    borderBottom: '1px solid var(--nier-border)', 
-                    paddingBottom: '4px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}>
-                    {animeLogs[selectedAnimeIdx].title.toUpperCase()}
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
-                    <span style={{ color: 'var(--nier-text-muted)' }}>DIAGNOSTIC_RATING:</span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--nier-accent)', fontWeight: 'bold' }}>
-                      <Star size={12} style={{ fill: 'var(--nier-accent)' }} />
-                      {animeLogs[selectedAnimeIdx].rating}/10
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span style={{ fontSize: '10px', color: 'var(--nier-text-muted)', fontFamily: 'var(--font-mono)' }}>OPERATOR_LOG:</span>
-                    <p style={{ 
-                      fontSize: '11px', 
-                      fontStyle: 'italic', 
-                      margin: 0, 
-                      lineHeight: '1.4',
-                      color: 'var(--nier-text)',
-                      overflowY: 'auto',
-                      maxHeight: '75px'
+                  {isTransitioning ? (
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '200px',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '12px',
+                      color: 'var(--nier-text-muted)',
+                      gap: '10px',
+                      position: 'relative',
+                      zIndex: 2,
                     }}>
-                      "{animeLogs[selectedAnimeIdx].note}"
-                    </p>
-                  </div>
+                      <span>&gt; ACCESSING CLASSIFIED RECORD...</span>
+                      <span className="nier-cursor" />
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', position: 'relative', zIndex: 2 }}>
+                      {/* Left: Tall Poster */}
+                      <div style={{
+                        width: '140px',
+                        minWidth: '140px',
+                        flexShrink: 0,
+                        position: 'relative',
+                        borderRight: `3px solid ${animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-border)'}`,
+                      }}>
+                        <div className="anime-corner-tl" />
+                        <div className="anime-corner-br" />
+                        <img
+                          src={animeLogs[selectedAnimeIdx]?.coverUrl}
+                          alt={animeLogs[selectedAnimeIdx]?.title}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            minHeight: '220px',
+                            objectFit: 'cover',
+                            filter: 'sepia(0.12) contrast(1.08)',
+                            display: 'block',
+                          }}
+                          loading="lazy"
+                        />
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          backgroundColor: animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-border)',
+                          color: '#fff',
+                          fontSize: '9px',
+                          fontFamily: 'var(--font-mono)',
+                          padding: '4px 8px',
+                          fontWeight: 'bold',
+                          textAlign: 'center',
+                          letterSpacing: '0.12em',
+                        }}>
+                          {animeLogs[selectedAnimeIdx]?.type?.toUpperCase()}
+                        </div>
+                      </div>
+
+                      {/* Right: Data Sheet */}
+                      <div style={{ flex: 1, padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
+                        {/* Title */}
+                        <div style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '15px',
+                          fontWeight: 'bold',
+                          borderBottom: '1px solid var(--nier-border-muted)',
+                          paddingBottom: '8px',
+                          letterSpacing: '0.04em',
+                        }}>
+                          {animeLogs[selectedAnimeIdx]?.title?.toUpperCase()}
+                        </div>
+
+                        {/* Star Rating Blocks */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <span style={{ fontSize: '10px', color: 'var(--nier-text-muted)', fontFamily: 'var(--font-mono)' }}>DIAGNOSTIC_RATING:</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '16px', letterSpacing: '3px', color: animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-text)' }}>
+                              {renderStarBlocks(animeLogs[selectedAnimeIdx]?.rating || 0)}
+                            </span>
+                            <span style={{ fontSize: '11px', color: 'var(--nier-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                              {animeLogs[selectedAnimeIdx]?.rating}/10
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Existential Threat Bar */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                          <span style={{ fontSize: '10px', color: 'var(--nier-text-muted)', fontFamily: 'var(--font-mono)' }}>EXISTENTIAL_THREAT_LEVEL:</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ flex: 1, height: '4px', backgroundColor: 'var(--nier-bg)', border: '1px solid var(--nier-border-muted)', overflow: 'hidden' }}>
+                              <div style={{
+                                width: `${(animeLogs[selectedAnimeIdx]?.existentialThreat || 0) * 10}%`,
+                                height: '100%',
+                                backgroundColor: animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-text)',
+                                transition: 'width 0.9s cubic-bezier(0.16, 1, 0.3, 1)',
+                              }} />
+                            </div>
+                            <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)', color: 'var(--nier-text-muted)', minWidth: '30px' }}>
+                              {animeLogs[selectedAnimeIdx]?.existentialThreat}/10
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Genre Tag Chips */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                          {animeLogs[selectedAnimeIdx]?.tags?.map(tag => (
+                            <span key={tag} style={{
+                              fontSize: '9px',
+                              fontFamily: 'var(--font-mono)',
+                              border: `1px solid ${animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-border)'}`,
+                              color: animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-text)',
+                              padding: '2px 7px',
+                              letterSpacing: '0.07em',
+                            }}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Operator Note */}
+                        <blockquote style={{
+                          margin: 0,
+                          padding: '10px 12px',
+                          borderLeft: `3px solid ${animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-border)'}`,
+                          backgroundColor: 'rgba(0,0,0,0.03)',
+                          fontSize: '12px',
+                          lineHeight: '1.6',
+                          color: 'var(--nier-text)',
+                        }}>
+                          <span style={{ fontSize: '9px', fontFamily: 'var(--font-mono)', color: 'var(--nier-text-muted)', display: 'block', marginBottom: '5px' }}>
+                            OPERATOR_LOG:
+                          </span>
+                          <em>"{animeLogs[selectedAnimeIdx]?.note}"</em>
+                        </blockquote>
+
+                        {/* Kitsu Link */}
+                        <a
+                          href={animeLogs[selectedAnimeIdx]?.kitsuUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="nier-btn small"
+                          onClick={() => Sound.playClick()}
+                          onMouseEnter={() => Sound.playHover()}
+                          style={{ textDecoration: 'none', alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}
+                        >
+                          <ExternalLink size={10} /> [ VIEW ON KITSU ]
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
+
 
         </div>
 
@@ -1091,129 +1230,124 @@ export const ArtWeeb: React.FC = () => {
 
         {/* Track list */}
         {scStatus === 'ok' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div>
             {scTracks.length === 0 && (
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--nier-text-muted)' }}>
                 &gt; No liked tracks found.
               </div>
             )}
-            {scTracks.map((track, idx) => {
-              const mins = Math.floor(track.duration / 60000);
-              const secs = String(Math.floor((track.duration % 60000) / 1000)).padStart(2, '0');
-              return (
-                <a
-                  key={track.id}
-                  href={track.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                  onClick={() => Sound.playClick()}
-                >
-                  <div
-                    className="nier-panel"
-                    style={{
-                      display: 'flex',
-                      gap: '14px',
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.15s ease, border-color 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      Sound.playHover();
-                      (e.currentTarget as HTMLElement).style.borderColor = 'var(--nier-border)';
-                      (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--nier-accent-dim)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.borderColor = '';
-                      (e.currentTarget as HTMLElement).style.backgroundColor = '';
-                    }}
+            <div className="sc-tracks-grid">
+              {scTracks.map((track, idx) => {
+                const mins = Math.floor(track.duration / 60000);
+                const secs = String(Math.floor((track.duration % 60000) / 1000)).padStart(2, '0');
+                const rankColor = SC_RANK_COLORS[idx % SC_RANK_COLORS.length];
+                return (
+                  <a
+                    key={track.id}
+                    href={track.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                    onClick={() => Sound.playClick()}
                   >
-                    {/* Index */}
-                    <div style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '13px',
-                      color: 'var(--nier-text-muted)',
-                      width: '26px',
-                      flexShrink: 0,
-                      textAlign: 'right',
-                    }}>
-                      {String(idx + 1).padStart(2, '0')}
-                    </div>
-
-                    {/* Artwork */}
-                    <div style={{
-                      width: '72px',
-                      height: '72px',
-                      flexShrink: 0,
-                      border: '1px solid var(--nier-border-muted)',
-                      overflow: 'hidden',
-                      position: 'relative',
-                      backgroundColor: 'var(--nier-bg-alt)',
-                    }}>
-                      {track.artwork ? (
-                        <img
-                          src={track.artwork}
-                          alt={track.title}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'sepia(0.2) contrast(1.05)' }}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Music size={24} style={{ color: 'var(--nier-text-muted)' }} />
-                        </div>
-                      )}
-                      {/* Scanline overlay */}
+                    <div
+                      className="nier-panel"
+                      style={{
+                        display: 'flex',
+                        gap: '12px',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.15s ease, box-shadow 0.2s ease',
+                        borderLeft: `3px solid ${rankColor}`,
+                        position: 'relative',
+                        height: '100%',
+                      }}
+                      onMouseEnter={(e) => {
+                        Sound.playHover();
+                        (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--nier-bg-alt)';
+                        (e.currentTarget as HTMLElement).style.boxShadow = `0 0 14px ${rankColor}44`;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.backgroundColor = '';
+                        (e.currentTarget as HTMLElement).style.boxShadow = '';
+                      }}
+                    >
+                      {/* Rank Badge */}
                       <div style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(rgba(78,75,66,0.12) 50%, transparent 50%)',
-                        backgroundSize: '100% 3px',
-                        pointerEvents: 'none',
-                      }} />
-                    </div>
-
-                    {/* Track info */}
-                    <div style={{ flex: 1, overflow: 'hidden' }}>
-                      <div style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
                         fontFamily: 'var(--font-mono)',
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                        fontSize: '9px',
+                        color: rankColor,
+                        letterSpacing: '0.05em',
                       }}>
-                        {track.title}
+                        LIKED #{String(idx + 1).padStart(2, '0')}
                       </div>
-                      <div style={{ fontSize: '13px', color: 'var(--nier-text-muted)', marginTop: '4px' }}>
-                        {track.artist}
+
+                      {/* Artwork */}
+                      <div style={{
+                        width: '58px',
+                        height: '58px',
+                        flexShrink: 0,
+                        border: `1px solid ${rankColor}66`,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        backgroundColor: 'var(--nier-bg-alt)',
+                      }}>
+                        {track.artwork ? (
+                          <img
+                            src={track.artwork}
+                            alt={track.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'sepia(0.2) contrast(1.05)' }}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Music size={20} style={{ color: 'var(--nier-text-muted)' }} />
+                          </div>
+                        )}
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          background: 'linear-gradient(rgba(78,75,66,0.12) 50%, transparent 50%)',
+                          backgroundSize: '100% 3px',
+                          pointerEvents: 'none',
+                        }} />
                       </div>
-                    </div>
 
-                    {/* Stats */}
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-end',
-                      gap: '6px',
-                      flexShrink: 0,
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '12px',
-                      color: 'var(--nier-text-muted)',
-                    }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <Play size={10} /> {track.plays.toLocaleString()}
-                      </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <Heart size={10} /> {track.likes.toLocaleString()}
-                      </span>
-                      <span>{mins}:{secs}</span>
-                    </div>
+                      {/* Track info */}
+                      <div style={{ flex: 1, overflow: 'hidden', paddingRight: '52px' }}>
+                        <div style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '13px',
+                          fontWeight: 'bold',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          marginBottom: '3px',
+                        }}>
+                          {track.title}
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--nier-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '6px' }}>
+                          {track.artist}
+                        </div>
+                        <div style={{ display: 'flex', gap: '10px', fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--nier-text-muted)' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <Play size={8} /> {track.plays.toLocaleString()}
+                          </span>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <Heart size={8} /> {track.likes.toLocaleString()}
+                          </span>
+                          <span>{mins}:{secs}</span>
+                        </div>
+                      </div>
 
-                    {/* Link icon */}
-                    <ExternalLink size={14} style={{ color: 'var(--nier-text-muted)', flexShrink: 0 }} />
-                  </div>
-                </a>
-              );
-            })}
+                      <ExternalLink size={12} style={{ color: 'var(--nier-text-muted)', flexShrink: 0 }} />
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

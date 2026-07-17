@@ -76,12 +76,27 @@ const AuthSchema = new mongoose.Schema({
   adminPasswordHash: { type: String, default: '' }
 }, schemaOptions);
 
+// ─── Otaku Record Schema ─────────────────────────────────────────────────────
+const OtakuRecordSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
+  title: { type: String, required: true },
+  type: { type: String, default: 'Anime' },
+  rating: Number,
+  existentialThreat: Number,
+  note: String,
+  coverUrl: String,
+  kitsuUrl: String,
+  tags: [String],
+  accentColor: String
+}, schemaOptions);
+
 export const Post = mongoose.model('Post', PostSchema);
 export const Project = mongoose.model('Project', ProjectSchema);
 export const Media = mongoose.model('Media', MediaSchema);
 export const Setting = mongoose.model('Setting', SettingSchema);
 export const Log = mongoose.model('Log', LogSchema);
 export const Auth = mongoose.model('Auth', AuthSchema);
+export const OtakuRecord = mongoose.model('OtakuRecord', OtakuRecordSchema);
 
 // Seed default databases on server boot if they are empty
 export async function seedDatabase() {
@@ -225,6 +240,61 @@ export async function seedDatabase() {
         isInitialized: false,
         adminPasswordHash: ''
       });
+    }
+
+    const otakuCount = await OtakuRecord.countDocuments();
+    if (otakuCount === 0) {
+      console.log('[DATABASE] Seeding default Otaku records...');
+      await OtakuRecord.insertMany([
+        {
+          _id: 'otaku-lain',
+          title: 'Serial Experiments Lain',
+          type: 'Anime',
+          rating: 10,
+          existentialThreat: 9.5,
+          note: 'Peak cyber-punk philosophy and terminal diagnostics. Lain is everywhere.',
+          coverUrl: 'https://media.kitsu.app/anime/poster_images/306/medium.jpg',
+          kitsuUrl: 'https://kitsu.io/anime/serial-experiments-lain',
+          tags: ['PSYCHOLOGICAL', 'CYBERPUNK', 'MASTERPIECE', 'ESSENTIAL'],
+          accentColor: 'hsl(210, 30%, 50%)'
+        },
+        {
+          _id: 'otaku-eva',
+          title: 'Neon Genesis Evangelion',
+          type: 'Anime',
+          rating: 10,
+          existentialThreat: 10,
+          note: 'Deep psychological machinery and existential core. End of Evangelion is a war crime on your emotions.',
+          coverUrl: 'https://media.kitsu.app/anime/21/poster_image/medium-d98a2928c9eda0d71f0dab72c1a0124d.jpeg',
+          kitsuUrl: 'https://kitsu.io/anime/neon-genesis-evangelion',
+          tags: ['PSYCHOLOGICAL', 'MECHA', 'TRAUMA_CORE', 'MASTERPIECE'],
+          accentColor: 'hsl(160, 28%, 44%)'
+        },
+        {
+          _id: 'otaku-nier',
+          title: 'NieR: Automata Ver1.1a',
+          type: 'Anime',
+          rating: 9,
+          existentialThreat: 8,
+          note: 'Gorgeous anime adaptation of the YoRHa narrative. Appropriately running this very OS.',
+          coverUrl: 'https://media.kitsu.app/anime/47784/poster_image/medium-87164c01153374979cbb13368c4635a1.jpeg',
+          kitsuUrl: 'https://kitsu.io/anime/nier-automata-ver11a',
+          tags: ['SCI-FI', 'YORHA_LORE', 'ACTION', 'EMOTIONAL'],
+          accentColor: 'hsl(38, 35%, 48%)'
+        },
+        {
+          _id: 'otaku-sg',
+          title: 'Steins;Gate',
+          type: 'Anime',
+          rating: 9.5,
+          existentialThreat: 7,
+          note: 'Time travel, loop theories, and worldline matrices. Episode 22 destroyed me.',
+          coverUrl: 'https://media.kitsu.app/anime/poster_images/5646/medium.jpg',
+          kitsuUrl: 'https://kitsu.io/anime/steins-gate',
+          tags: ['SCI-FI', 'TIME_TRAVEL', 'THRILLER', 'REWATCH'],
+          accentColor: 'hsl(275, 28%, 48%)'
+        }
+      ]);
     }
     console.log('[DATABASE] Seeding integrity check completed successfully.');
   } catch (err) {
