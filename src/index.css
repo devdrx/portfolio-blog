@@ -763,6 +763,10 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
 
 @media (max-width: 576px) {
   .arrow-chain {
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+  .desktop-only-enter-hint {
     display: none !important;
   }
 }

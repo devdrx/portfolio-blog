@@ -168,19 +168,33 @@ export const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
               <span className="arrow" style={{ animationDelay: '0.6s' }}>&gt;</span>
             </div>
 
-            <button 
-              className="nier-btn" 
-              onClick={handleStartBoot}
-              style={{ 
-                padding: '12px 30px', 
-                fontSize: '14px', 
-                color: '#d1cdbc',
-                borderColor: '#8c887a',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              [ INITIATE CONNECTION ]
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+              <button 
+                className="nier-btn" 
+                onClick={handleStartBoot}
+                style={{ 
+                  padding: '12px 30px', 
+                  fontSize: '14px', 
+                  color: '#d1cdbc',
+                  borderColor: '#8c887a',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                [ INITIATE CONNECTION ]
+              </button>
+              <div className="desktop-only-enter-hint" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '10px', color: '#8c887a', fontFamily: 'var(--font-mono)' }}>
+                <span>OR PRESS</span>
+                <kbd style={{
+                  border: '1px solid #8c887a',
+                  padding: '2px 6px',
+                  borderRadius: '2px',
+                  backgroundColor: 'rgba(209, 205, 188, 0.05)',
+                  fontSize: '9px',
+                  color: '#d1cdbc',
+                  fontFamily: 'var(--font-mono)'
+                }}>↵ ENTER</kbd>
+              </div>
+            </div>
 
             {/* Right Arrowheads pointing left (towards button) */}
             <div className="arrow-chain">
