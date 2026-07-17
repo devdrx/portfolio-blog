@@ -1295,6 +1295,15 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
 }
 
 /* ── ArtWeeb: Otaku Dossier Card Mobile Responsiveness ──────────────────── */
+.art-grid-main > div {
+  min-width: 0;
+}
+
+.otaku-stars {
+  font-size: 16px;
+  letter-spacing: 3px;
+}
+
 .otaku-dossier-card {
   display: flex;
   flex-direction: row;
@@ -1343,10 +1352,42 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   font-size: 11px !important;
 }
 
+@media (max-width: 768px) {
+  .otaku-dossier-card {
+    flex-direction: column !important;
+  }
+  .otaku-dossier-poster {
+    width: 100% !important;
+    min-width: unset !important;
+    height: 220px !important;
+    border-right: none !important;
+    border-bottom: 2px solid var(--nier-border-muted) !important;
+  }
+  .otaku-dossier-details {
+    max-width: 100% !important;
+    padding: 15px !important;
+  }
+}
+
 @media (max-width: 576px) {
   .otaku-dossier-details {
     padding: 10px !important;
     gap: 6px !important;
+  }
+  .otaku-stars {
+    font-size: 12px !important;
+    letter-spacing: 1px !important;
+  }
+  .jukebox-controls {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .jukebox-controls button {
+    padding: 5px 8px !important;
+    font-size: 10px !important;
+  }
+  .jukebox-controls button.nier-btn {
+    width: auto !important;
   }
 }
 

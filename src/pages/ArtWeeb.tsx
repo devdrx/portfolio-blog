@@ -516,6 +516,7 @@ export const ArtWeeb: React.FC = () => {
                     alignItems: 'center', 
                     justifyContent: 'center', 
                     flex: 1, 
+                    minWidth: 0,
                     height: '100%', 
                     position: 'relative',
                     gap: '15px'
@@ -869,8 +870,8 @@ export const ArtWeeb: React.FC = () => {
                         {/* Star Rating Blocks */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <span style={{ fontSize: '10px', color: 'var(--nier-text-muted)', fontFamily: 'var(--font-mono)' }}>DIAGNOSTIC_RATING:</span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '16px', letterSpacing: '3px', color: animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-text)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                            <span className="otaku-stars" style={{ fontFamily: 'var(--font-mono)', color: animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-text)' }}>
                               {renderStarBlocks(animeLogs[selectedAnimeIdx]?.rating || 0)}
                             </span>
                             <span style={{ fontSize: '11px', color: 'var(--nier-text-muted)', fontFamily: 'var(--font-mono)' }}>
@@ -1029,7 +1030,7 @@ export const ArtWeeb: React.FC = () => {
                 </div>
 
                 {/* Playback Controls Row */}
-                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
+                <div className="jukebox-controls" style={{ display: 'flex', gap: '8px', justifyContent: 'center', alignItems: 'center' }}>
                   <button 
                     className="nier-btn" 
                     onClick={handlePrevTrack}
