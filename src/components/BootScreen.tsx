@@ -238,14 +238,26 @@ export const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
           </div>
         )}
 
-        <div style={{ marginTop: '40px', alignSelf: 'flex-end' }}>
+        <div style={{ marginTop: '40px', alignSelf: 'flex-end', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
           <button 
             className="nier-btn danger" 
             onClick={handleSkip}
-            style={{ padding: '6px 14px', fontSize: '12px' }}
+            style={{ padding: '6px 14px', fontSize: '12px', whiteSpace: 'nowrap' }}
           >
             [ SKIP BOOT SEQUENCE ]
           </button>
+          <div className="desktop-only-enter-hint" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '9px', color: '#8c887a', fontFamily: 'var(--font-mono)' }}>
+            <span>OR PRESS</span>
+            <kbd style={{
+              border: '1px solid #8c887a',
+              padding: '1px 5px',
+              borderRadius: '2px',
+              backgroundColor: 'rgba(209, 205, 188, 0.05)',
+              fontSize: '8px',
+              color: '#d1cdbc',
+              fontFamily: 'var(--font-mono)'
+            }}>↵ ENTER</kbd>
+          </div>
         </div>
       </div>
     </div>
