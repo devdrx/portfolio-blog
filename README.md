@@ -6,12 +6,13 @@ A premium retro-futuristic portfolio-blog inspired by **NieR: Automata's YoRHa t
 
 ## 1. Core Feature Set
 
-The application is split into public pages (Tabs `01` to `04`) and a hidden administrative maintenance shell:
+The application is split into public pages (Tabs `01` to `04`) and a hidden administrative maintenance shell, built with a comprehensive mobile-responsive design:
 
 *   **Tactical Connection Boot Screen (`BootScreen.tsx`):**
     *   Pre-connection portal that mimics the tactical synchronization console.
     *   Displays progressive diagnostic boot log strings with sound notifications.
     *   Bypasses the browser's audio autoplay restrictions by capturing the initial user interaction (`[ INITIATE CONNECTION ]`) to resume the `AudioContext` timeline.
+    *   Designed responsively: hides arrow indicators and automatically scales down the terminal logo (`GLORY TO MANKIND // YoRHa`) on screen sizes below `600px` to prevent layout overflows.
 *   **Cinematic Page Transitions (`AirlockTransition.tsx`):**
     *   Features sliding blast doors, engaging mechanical locking bolts, system loading screens, white CRT static flashes, and page reveals.
     *   Saves state in `sessionStorage` to trigger a shorter, expedited animation sequence on repeat navigation.
@@ -20,24 +21,33 @@ The application is split into public pages (Tabs `01` to `04`) and a hidden admi
     *   Displays active unit profile specifications, diagnostic check status lists, and system resource CPU load indicators.
     *   Loads and maps public featured projects list.
     *   Pulls profile data dynamically from the system backend configurations.
+    *   Collapses columns into single-column vertical layout flows on smaller screens.
 *   **SoundCloud Jukebox & Arpeggiator (`ArtWeeb.tsx` // `02_ART`):**
     *   **SoundCloud Proxy Module:** Fetches real-time profile stats, track details, and favorite likes using a backend SoundCloud API proxy.
     *   **Procedural Synth Sequencer:** A 4-step arpeggiator that allows scheduling custom audio notes over a high-precision clock queue.
+    *   **Adaptive Image Carousel:** Automatically hides left/right flanking images on mobile viewports so that the active center image scales to `100%` width without overlap or squishing.
 *   **Markdown & LaTeX Blog Engine (`Blog.tsx` // `03_BLOG`):**
     *   Compiles Markdown body content, LaTeX math formulas, and code block formatting.
     *   Includes custom code block containers with click-to-copy headers.
     *   Provides Category filtering tags and search string query parameters.
+    *   **Swipeable Mobile Drawer:** On viewports below `992px`, the Archive Index panel collapses into a touch-drag-responsive slide-out drawer. Users can tap the drawer tab handle, click the index button, or drag-swipe the edge of the screen to open/close the drawer with real-time transform snapping.
 *   **System Settings & Diagnostic Console (`SystemSettings.tsx` // `04_SYSTEM`):**
     *   Controls volume calibration parameters and visual mode toggles (Light/Dark themes, Scanline animations).
     *   Provides visual database operations (Factory reset, backup export, and import config bundles).
     *   Exposes a system logs stream panel that updates dynamically with user actions.
+    *   Collapses column layouts cleanly into a vertical stack and wraps option buttons on mobile to avoid overflow.
 *   **Administrative Maintenance Console:**
     *   **Access Triggers:** Triggered by typing the sequence `"access yorha"` anywhere on the public page, or using the keyboard shortcut `Ctrl+Shift+A`.
     *   **Maintenance Dashboard:** Displays live health statuses, total size summaries of media directories, post/draft counts, and backup logs.
+    *   **Collapsible Admin Navigation:** Renders a slider navigation drawer toggled by a top status-bar hamburger menu button on mobile/tablet viewports, automatically closing when selecting a tab.
     *   **Posts Editor:** Full CRUD interfaces to draft, edit, preview, compile, publish, and delete blog posts. Supports bulk publishing and bulk deletion.
     *   **Projects Panel:** Admin CRUD panel to manage, sort, hide/show, and add github/demo links for portfolio projects.
     *   **Media Gallery:** File-uploader backing system. Uploads raw binary assets, displays images, copy-pastes visual URLs, and wipes media nodes.
     *   **Logs Console:** Renders system event logs logged by the backend.
+*   **Global Layout Polish & Navigation:**
+    *   **Responsive Header Hamburger:** On screens below `992px`, the public navigation bar shifts into a collapsible drawer. All configuration options (Dark/Light mode toggles, mute switch) hide cleanly inside this menu on mobile to maintain a clutter-free display.
+    *   **Status Ticker:** MODULE_LOCATION text in the sub-header converts to an auto-scrolling marquee ticker on mobile viewports to prevent wrapping lines.
+    *   **Non-wrapping Buttons:** All tactical bracketed buttons (`.nier-btn`) enforce `white-space: nowrap` globally to prevent text and closing brackets (`]`) from wrapping awkwardly.
 
 ---
 

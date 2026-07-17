@@ -441,14 +441,14 @@ export const Blog: React.FC = () => {
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <div style={{ display: 'flex', gap: '4px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
                     <button 
-                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontWeight: fontFamily === 'sans' ? 'bold' : 'normal', textDecoration: fontFamily === 'sans' ? 'underline' : 'none' }}
+                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'inherit', fontWeight: fontFamily === 'sans' ? 'bold' : 'normal', textDecoration: fontFamily === 'sans' ? 'underline' : 'none' }}
                       onClick={() => { Sound.playHover(); setFontFamily('sans'); }}
                     >
                       SANS
                     </button>
                     <span style={{ color: 'var(--nier-border-muted)' }}>/</span>
                     <button 
-                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontWeight: fontFamily === 'mono' ? 'bold' : 'normal', textDecoration: fontFamily === 'mono' ? 'underline' : 'none' }}
+                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'inherit', fontWeight: fontFamily === 'mono' ? 'bold' : 'normal', textDecoration: fontFamily === 'mono' ? 'underline' : 'none' }}
                       onClick={() => { Sound.playHover(); setFontFamily('mono'); }}
                     >
                       MONO
@@ -459,19 +459,19 @@ export const Blog: React.FC = () => {
 
                   <div style={{ display: 'flex', gap: '4px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
                     <button 
-                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontWeight: fontSize === 'small' ? 'bold' : 'normal', textDecoration: fontSize === 'small' ? 'underline' : 'none' }}
+                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'inherit', fontWeight: fontSize === 'small' ? 'bold' : 'normal', textDecoration: fontSize === 'small' ? 'underline' : 'none' }}
                       onClick={() => { Sound.playHover(); setFontSize('small'); }}
                     >
                       A-
                     </button>
                     <button 
-                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontWeight: fontSize === 'medium' ? 'bold' : 'normal', textDecoration: fontSize === 'medium' ? 'underline' : 'none' }}
+                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'inherit', fontWeight: fontSize === 'medium' ? 'bold' : 'normal', textDecoration: fontSize === 'medium' ? 'underline' : 'none' }}
                       onClick={() => { Sound.playHover(); setFontSize('medium'); }}
                     >
                       A
                     </button>
                     <button 
-                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontWeight: fontSize === 'large' ? 'bold' : 'normal', textDecoration: fontSize === 'large' ? 'underline' : 'none' }}
+                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'inherit', fontWeight: fontSize === 'large' ? 'bold' : 'normal', textDecoration: fontSize === 'large' ? 'underline' : 'none' }}
                       onClick={() => { Sound.playHover(); setFontSize('large'); }}
                     >
                       A+
