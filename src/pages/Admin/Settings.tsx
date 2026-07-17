@@ -384,7 +384,7 @@ export const Settings: React.FC = () => {
               <UserSquare2 size={14} /> UNIT_PROFILE_PICTURE
             </h3>
 
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+            <div className="pfp-setup-row">
               {/* Live preview */}
               <div style={{
                 width: '90px',
@@ -449,7 +449,7 @@ export const Settings: React.FC = () => {
               Test visual sound module configurations. Click triggers Web Audio oscillator synthetics.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div className="admin-grid-1-1" style={{ gap: '10px' }}>
               <button className="nier-btn small" onClick={() => playTestSound('click')}>[ TEST CLICK ]</button>
               <button className="nier-btn small" onClick={() => playTestSound('hover')}>[ TEST HOVER ]</button>
               <button className="nier-btn small" onClick={() => playTestSound('chime')}>[ TEST SUCCESS CHIME ]</button>

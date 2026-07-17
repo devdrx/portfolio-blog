@@ -91,7 +91,7 @@ export const SystemSettings: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', fontSize: '14px' }}>
 
             {/* Scanlines Select */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="settings-row">
               <div>
                 <strong>SCREEN_SCANLINES:</strong>
                 <div style={{ fontSize: '11px', color: 'var(--nier-text-muted)' }}>Toggles the pixelated vertical scan overlays.</div>
@@ -99,7 +99,7 @@ export const SystemSettings: React.FC = () => {
               <button 
                 className={`nier-btn small ${showScanlines ? 'active' : ''}`}
                 onClick={handleScanlineToggle}
-                style={{ width: '120px' }}
+                style={{ width: '120px', flexShrink: 0 }}
               >
                 {showScanlines ? '[ ENABLED ]' : '[ DISABLED ]'}
               </button>
@@ -143,14 +143,14 @@ export const SystemSettings: React.FC = () => {
               SYNTHESIZER AUDIO CORE
             </h3>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="settings-row">
               <div>
                 <strong>AUDIO_SYNTHESIS:</strong>
               </div>
               <button 
                 className={`nier-btn small ${isMuted ? 'danger active' : ''}`}
                 onClick={handleMuteToggle}
-                style={{ width: '120px' }}
+                style={{ width: '120px', flexShrink: 0 }}
               >
                 {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />} 
                 {isMuted ? ' [ MUTED ]' : ' [ ON ]'}
@@ -179,7 +179,7 @@ export const SystemSettings: React.FC = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            <div className="settings-actions">
               <button className="nier-btn small" onClick={testChime} style={{ flexGrow: 1 }} disabled={isMuted}>
                 <PlayCircle size={12} /> TEST CHIME
               </button>

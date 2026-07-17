@@ -588,7 +588,7 @@ export const Posts: React.FC = () => {
               </div>
 
               {/* Slug, Category, Featured Image grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '15px', fontSize: '13px' }}>
+              <div className="admin-grid-1-2" style={{ fontSize: '13px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label style={{ fontFamily: 'var(--font-mono)' }}>RECORD SLUG</label>
                   <input 
@@ -615,7 +615,7 @@ export const Posts: React.FC = () => {
               </div>
 
               {/* Tags, Featured image */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '15px', fontSize: '13px' }}>
+              <div className="admin-grid-2-1" style={{ fontSize: '13px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label style={{ fontFamily: 'var(--font-mono)' }}>TAGS (COMMA SEPARATED)</label>
                   <input 
@@ -633,7 +633,7 @@ export const Posts: React.FC = () => {
                     value={featuredImage}
                     onChange={(e) => setFeaturedImage(e.target.value)}
                     placeholder="https://images.unsplash.com/..."
-                    style={{ backgroundColor: 'var(--nier-bg)', border: '1px solid var(--nier-border)', color: 'var(--nier-text)', padding: '8px 12px', fontFamily: 'var(--font-mono)', fontSize: '11px' }}
+                    style={{ backgroundColor: 'var(--nier-bg)', border: '1px solid var(--nier-border)', color: 'var(--nier-text)', padding: '8px 12px', fontSize: '12px' }}
                   />
                 </div>
               </div>
@@ -697,7 +697,7 @@ export const Posts: React.FC = () => {
               {/* SEO metadata */}
               <div style={{ borderTop: '1px solid var(--nier-border-muted)', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <h4 style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--nier-text-muted)' }}>SEO META CONFIGURATION</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '13px' }}>
+                <div className="admin-grid-1-1" style={{ fontSize: '13px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <label style={{ fontFamily: 'var(--font-mono)' }}>META TITLE</label>
                     <input type="text" value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} placeholder="Meta title..." style={{ backgroundColor: 'var(--nier-bg)', border: '1px solid var(--nier-border)', color: 'var(--nier-text)', padding: '6px 10px', fontSize: '12px' }} />

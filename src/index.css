@@ -1000,10 +1000,35 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   grid-template-columns: 1.2fr 1fr;
   gap: 30px;
 }
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+.settings-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
 @media (max-width: 992px) {
   .settings-grid {
     grid-template-columns: 1fr !important;
     gap: 20px !important;
+  }
+}
+@media (max-width: 576px) {
+  .settings-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .settings-row button {
+    width: 100% !important;
+  }
+  .settings-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
   }
 }
 
@@ -1126,3 +1151,106 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
   }
 }
 
+/* Responsive Grid Helper for admin forms */
+.admin-grid-1-2 {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 15px;
+}
+.admin-grid-2-1 {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 15px;
+}
+.admin-grid-1-1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+.admin-grid-15-1 {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .admin-grid-1-2,
+  .admin-grid-2-1,
+  .admin-grid-1-1,
+  .admin-grid-15-1 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+@media (max-width: 576px) {
+  .pfp-setup-row {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .pfp-setup-row button {
+    width: 100% !important;
+    white-space: normal !important;
+    justify-content: center !important;
+  }
+  .nier-panel .nier-btn {
+    white-space: normal !important;
+    text-align: center !important;
+    justify-content: center !important;
+    height: auto !important;
+    min-height: 32px !important;
+    padding: 8px 12px !important;
+  }
+}
+
+/* ── Home Page: Portrait Ring ───────────────────────────────────────────── */
+.portrait-ring {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 2px solid var(--nier-accent);
+  border-radius: 0;
+  opacity: 0;
+  animation: portrait-ring-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes portrait-ring-pulse {
+  0%   { opacity: 0;    transform: scale(1); }
+  30%  { opacity: 0.55; transform: scale(1.04); }
+  60%  { opacity: 0.2;  transform: scale(1.08); }
+  100% { opacity: 0;    transform: scale(1.12); }
+}
+
+/* ── Home Page: Status Dot Pulse ────────────────────────────────────────── */
+@keyframes status-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ── Home Page: Objective Scan-in ───────────────────────────────────────── */
+@keyframes objective-scan {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Home Page: pfp-setup-row ───────────────────────────────────────────── */
+.pfp-setup-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+@media (max-width: 576px) {
+  .pfp-setup-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .pfp-setup-row button {
+    width: 100%;
+    white-space: normal;
+    justify-content: center;
+  }
+}

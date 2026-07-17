@@ -233,7 +233,7 @@ export const Projects: React.FC = () => {
           {/* Form grid layout */}
           <div className="nier-panel" style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '650px', margin: '0 auto', width: '100%' }}>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '15px', fontSize: '13px' }}>
+            <div className="admin-grid-15-1" style={{ fontSize: '13px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <label style={{ fontFamily: 'var(--font-mono)' }}>PROJECT TITLE</label>
                 <input 
@@ -277,7 +277,7 @@ export const Projects: React.FC = () => {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '13px' }}>
+            <div className="admin-grid-1-1" style={{ fontSize: '13px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <label style={{ fontFamily: 'var(--font-mono)' }}>GITHUB SOURCE URL</label>
                 <input type="text" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} placeholder="https://github.com/..." style={{ backgroundColor: 'var(--nier-bg)', border: '1px solid var(--nier-border)', color: 'var(--nier-text)', padding: '8px 12px', fontSize: '12px' }} />
@@ -288,7 +288,7 @@ export const Projects: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '13px' }}>
+            <div className="admin-grid-1-1" style={{ fontSize: '13px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <label style={{ fontFamily: 'var(--font-mono)' }}>IMAGE PREVIEW URL</label>
                 <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://images.unsplash..." style={{ backgroundColor: 'var(--nier-bg)', border: '1px solid var(--nier-border)', color: 'var(--nier-text)', padding: '8px 12px', fontSize: '12px' }} />
