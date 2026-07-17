@@ -1293,3 +1293,60 @@ h1, h2, h3, h4, h5, h6, .nier-mono {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── ArtWeeb: Otaku Dossier Card Mobile Responsiveness ──────────────────── */
+.otaku-dossier-card {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background-color: var(--nier-bg-alt);
+}
+
+.otaku-dossier-poster {
+  width: 100px;
+  min-width: 100px;
+  flex-shrink: 0;
+  position: relative;
+  border-right-style: solid;
+  border-right-width: 2px;
+  box-sizing: border-box;
+}
+
+.otaku-dossier-poster img {
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+.otaku-dossier-details {
+  flex: 1;
+  padding: 12px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  max-width: calc(100% - 100px);
+  box-sizing: border-box;
+}
+
+/* Make sure inner log wraps properly */
+.otaku-dossier-details blockquote {
+  margin: 0;
+  padding: 6px 8px !important;
+  border-left-width: 2px !important;
+  font-size: 11px !important;
+}
+
+@media (max-width: 576px) {
+  .otaku-dossier-details {
+    padding: 10px !important;
+    gap: 6px !important;
+  }
+}
+

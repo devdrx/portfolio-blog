@@ -819,28 +819,19 @@ export const ArtWeeb: React.FC = () => {
                       <span className="nier-cursor" />
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', position: 'relative', zIndex: 2 }}>
+                    <div className="otaku-dossier-card">
                       {/* Left: Tall Poster */}
-                      <div style={{
-                        width: '140px',
-                        minWidth: '140px',
-                        flexShrink: 0,
-                        position: 'relative',
-                        borderRight: `3px solid ${animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-border)'}`,
-                      }}>
+                      <div 
+                        className="otaku-dossier-poster"
+                        style={{
+                          borderColor: animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-border)',
+                        }}
+                      >
                         <div className="anime-corner-tl" />
-                        <div className="anime-corner-br" />
+                        <div className="anime-corner-br" style={{ bottom: '26px' }} />
                         <img
                           src={animeLogs[selectedAnimeIdx]?.coverUrl}
                           alt={animeLogs[selectedAnimeIdx]?.title}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            minHeight: '220px',
-                            objectFit: 'cover',
-                            filter: 'sepia(0.12) contrast(1.08)',
-                            display: 'block',
-                          }}
                           loading="lazy"
                         />
                         <div style={{
@@ -850,9 +841,9 @@ export const ArtWeeb: React.FC = () => {
                           right: 0,
                           backgroundColor: animeLogs[selectedAnimeIdx]?.accentColor || 'var(--nier-border)',
                           color: '#fff',
-                          fontSize: '9px',
+                          fontSize: '8px',
                           fontFamily: 'var(--font-mono)',
-                          padding: '4px 8px',
+                          padding: '3px 0',
                           fontWeight: 'bold',
                           textAlign: 'center',
                           letterSpacing: '0.12em',
@@ -862,7 +853,7 @@ export const ArtWeeb: React.FC = () => {
                       </div>
 
                       {/* Right: Data Sheet */}
-                      <div style={{ flex: 1, padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px', minWidth: 0 }}>
+                      <div className="otaku-dossier-details">
                         {/* Title */}
                         <div style={{
                           fontFamily: 'var(--font-mono)',
