@@ -7,9 +7,8 @@ let commitHash = 'dev-local';
 try {
   commitHash = execSync('git rev-parse --short HEAD').toString().trim();
 } catch (e) {
-  console.warn('Could not read git commit hash:', e);
+  // Ignore git hash check error in non-git environment
 }
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -26,6 +25,8 @@ export default defineConfig({
     },
   },
   build: {
+    cssMinify: true,
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks(id: string) {

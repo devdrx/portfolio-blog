@@ -364,7 +364,10 @@ export const App: React.FC = () => {
           {/* Dynamic sub-header line */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', fontFamily: 'var(--font-mono)', padding: '4px 0', color: 'var(--nier-text-muted)', borderBottom: '1px solid var(--nier-border-muted)', gap: '12px', overflow: 'hidden' }}>
             <div className="status-marquee-wrapper">
-              <span className="status-marquee-text">MODULE_LOCATION: {window.location.hostname.replace('.onrender.com', '').toUpperCase()}://portfolio-blog/{activeTab}</span>
+              <div className="status-marquee-content">
+                <span className="status-marquee-text">MODULE_LOCATION: {window.location.hostname.replace('.onrender.com', '').toUpperCase()}://portfolio-blog/{activeTab}</span>
+                <span className="status-marquee-text desktop-hide-marquee-duplicate">MODULE_LOCATION: {window.location.hostname.replace('.onrender.com', '').toUpperCase()}://portfolio-blog/{activeTab}</span>
+              </div>
             </div>
             <span style={{ whiteSpace: 'nowrap', flexShrink: 0, color: 'var(--nier-accent)' }}>YoRHa NETWORK STATUS: DECRYPTED</span>
           </div>
