@@ -1174,7 +1174,7 @@ export const ArtWeeb: React.FC = () => {
       </div>
 
       {/* ── SOUNDCLOUD: RECENTLY LIKED ─────────────────────────── */}
-      <div style={{ marginTop: '30px' }}>
+      <section className="soundcloud-section" style={{ marginTop: '30px' }}>
         <div className="title-decorator" style={{ marginBottom: '20px' }}>
           <span className="tag">SOUNDCLOUD</span>
           <h3 style={{ fontSize: '16px', margin: 0 }}>
@@ -1243,7 +1243,7 @@ export const ArtWeeb: React.FC = () => {
                     onClick={() => Sound.playClick()}
                   >
                     <div
-                      className="nier-panel"
+                      className="nier-panel sc-track-card"
                       style={{
                         display: 'flex',
                         gap: '12px',
@@ -1265,7 +1265,7 @@ export const ArtWeeb: React.FC = () => {
                       }}
                     >
                       {/* Rank Badge */}
-                      <div style={{
+                      <div className="sc-track-artwork" style={{
                         position: 'absolute',
                         top: '8px',
                         right: '8px',
@@ -1308,8 +1308,8 @@ export const ArtWeeb: React.FC = () => {
                       </div>
 
                       {/* Track info */}
-                      <div style={{ flex: 1, overflow: 'hidden', paddingRight: '52px' }}>
-                        <div style={{
+                      <div className="sc-track-info" style={{ flex: 1, overflow: 'hidden', paddingRight: '52px' }}>
+                        <div className="sc-track-title" style={{
                           fontFamily: 'var(--font-mono)',
                           fontSize: '13px',
                           fontWeight: 'bold',
@@ -1320,10 +1320,10 @@ export const ArtWeeb: React.FC = () => {
                         }}>
                           {track.title}
                         </div>
-                        <div style={{ fontSize: '11px', color: 'var(--nier-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '6px' }}>
+                        <div className="sc-track-artist" style={{ fontSize: '11px', color: 'var(--nier-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '6px' }}>
                           {track.artist}
                         </div>
-                        <div style={{ display: 'flex', gap: '10px', fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--nier-text-muted)' }}>
+                        <div className="sc-track-stats" style={{ display: 'flex', gap: '10px', fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'var(--nier-text-muted)' }}>
                           <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                             <Play size={8} /> {track.plays.toLocaleString()}
                           </span>
@@ -1342,7 +1342,7 @@ export const ArtWeeb: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </section>
 
       {/* Lightbox Zoom Modal Overlay */}
       {isZoomOpen && wallpapers.length > 0 && (
