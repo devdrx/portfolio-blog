@@ -107,7 +107,7 @@ const upload = multer({
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:4173', /\.vercel\.app$/, /\.netlify\.app$/],
+  origin: ['http://localhost:5173', 'http://localhost:4173', /\.vercel\.app$/, /\.netlify\.app$/, /\.github\.io$/],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
 }));
 app.use(express.json({ limit: '10mb' }));

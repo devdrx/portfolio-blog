@@ -3,15 +3,29 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
-// Intercept native fetch to automatically attach authorization header to admin requests
+// Intercept native fetch to automatically attach authorization header and rewrite base URLs
 const originalFetch = window.fetch;
 window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
-  const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+  let url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
   const token = sessionStorage.getItem('yorha_session_token');
+  const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, ''); // strip trailing slash
+  let updatedInput = input;
+
+  if (url.startsWith('/api/')) {
+    const targetUrl = `${apiBase}${url}`;
+    if (typeof input === 'string') {
+      updatedInput = targetUrl;
+    } else if (input instanceof URL) {
+      updatedInput = new URL(targetUrl);
+    } else if (input instanceof Request) {
+      updatedInput = new Request(targetUrl, input);
+    }
+    url = targetUrl;
+  }
   
-  if (token && url.startsWith('/api/') && !url.includes('/api/auth/login') && !url.includes('/api/auth/setup')) {
-    if (input instanceof Request) {
-      input.headers.set('Authorization', `Bearer ${token}`);
+  if (token && url.includes('/api/') && !url.includes('/api/auth/login') && !url.includes('/api/auth/setup')) {
+    if (updatedInput instanceof Request) {
+      updatedInput.headers.set('Authorization', `Bearer ${token}`);
     } else {
       init = init || {};
       init.headers = init.headers || {};
@@ -29,7 +43,7 @@ window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
       }
     }
   }
-  return originalFetch.call(this, input, init);
+  return originalFetch.call(this, updatedInput, init);
 };
 
 createRoot(document.getElementById('root')!).render(
