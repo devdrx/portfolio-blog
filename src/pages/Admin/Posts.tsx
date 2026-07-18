@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { postsService } from '../../services/posts';
 import type { BlogPost } from '../../services/posts';
-import { renderMarkdownToHtml } from '../Blog';
+import { renderMarkdownToHtml, handleCodeCopyClick } from '../Blog';
 import { Sound } from '../../components/SoundController';
 import { Toast } from '../../components/admin/Toast';
 import { ConfirmationDialog } from '../../components/admin/ConfirmationDialog';
@@ -31,8 +31,8 @@ export const Posts: React.FC = () => {
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'published' | 'draft'>('ALL');
-  let sortField: 'date' | 'title' = 'date';
-  let sortOrder: 'asc' | 'desc' = 'desc';
+  const [sortField, setSortField] = useState<'date' | 'title'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Selection states (for bulk actions)
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -89,9 +89,15 @@ export const Posts: React.FC = () => {
 
   const loadPosts = async () => {
     setLoading(true);
-    const data = await postsService.getPosts({ includeDrafts: true });
-    setPosts(data);
-    setLoading(false);
+    try {
+      const data = await postsService.getPosts({ includeDrafts: true });
+      setPosts(data);
+    } catch (err) {
+      console.error('Failed loading posts:', err);
+      showToastMessage('Failed to load records archive from server.', true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const showToastMessage = (message: string, isAlert = false) => {
@@ -186,17 +192,23 @@ export const Posts: React.FC = () => {
       readTime
     };
 
-    if (activePost) {
-      await postsService.updatePost(activePost.id, payload);
-      showToastMessage('Record updated successfully.');
-    } else {
-      await postsService.createPost(payload);
-      showToastMessage('Record archived successfully.');
+    try {
+      if (activePost) {
+        await postsService.updatePost(activePost.id, payload);
+        showToastMessage('Record updated successfully.');
+      } else {
+        await postsService.createPost(payload);
+        showToastMessage('Record archived successfully.');
+      }
+    } catch (err: any) {
+      Sound.playWarning();
+      showToastMessage(err.message || 'Failed to save record to server.', true);
+      return;
     }
 
     // Clear autosave backup
     localStorage.removeItem('yorha_editor_autosave');
-    
+
     Sound.playChime();
     loadPosts();
     setView('list');
@@ -324,8 +336,18 @@ export const Posts: React.FC = () => {
     } else {
       comp = a.title.localeCompare(b.title);
     }
-    return (sortOrder as string) === 'asc' ? comp : -comp;
+    return sortOrder === 'asc' ? comp : -comp;
   });
+
+  const handleSortChange = (field: 'date' | 'title') => {
+    Sound.playHover();
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
 
   // Pagination computations
   const totalPages = Math.ceil(filteredAndSortedPosts.length / itemsPerPage) || 1;
@@ -428,9 +450,21 @@ export const Posts: React.FC = () => {
                     </button>
                   </th>
                   <th style={{ padding: '12px 15px' }}>ID</th>
-                  <th style={{ padding: '12px 15px' }}>TITLE</th>
+                  <th
+                    style={{ padding: '12px 15px', cursor: 'pointer', userSelect: 'none' }}
+                    onClick={() => handleSortChange('title')}
+                    title="Sort by title"
+                  >
+                    TITLE {sortField === 'title' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+                  </th>
                   <th style={{ padding: '12px 15px', width: '100px' }}>STATUS</th>
-                  <th style={{ padding: '12px 15px', width: '100px' }}>DATE</th>
+                  <th
+                    style={{ padding: '12px 15px', width: '100px', cursor: 'pointer', userSelect: 'none' }}
+                    onClick={() => handleSortChange('date')}
+                    title="Sort by date"
+                  >
+                    DATE {sortField === 'date' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+                  </th>
                   <th style={{ padding: '12px 15px', width: '120px' }}>CATEGORY</th>
                   <th style={{ padding: '12px 15px', width: '130px', textAlign: 'right' }}>ACTIONS</th>
                 </tr>
@@ -746,7 +780,7 @@ export const Posts: React.FC = () => {
                     </h2>
                   </div>
 
-                  <div style={{ fontSize: '13px', textAlign: 'justify', color: 'var(--nier-text)' }}>
+                  <div style={{ fontSize: '13px', textAlign: 'justify', color: 'var(--nier-text)' }} onClick={handleCodeCopyClick}>
                     {content ? (
                       <div dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(content) }} />
                     ) : (

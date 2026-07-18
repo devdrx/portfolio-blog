@@ -23,7 +23,16 @@ interface AdminLayoutProps {
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sessionTime, setSessionTime] = useState(authService.getSessionExpiry());
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const currentHash = window.location.hash || '#/admin';
+  const [currentHash, setCurrentHash] = useState(window.location.hash || '#/admin');
+
+  // Track hash changes directly — reading window.location.hash only at render
+  // time meant sidebar highlighting relied on an unrelated re-render (the
+  // session timer) happening to fire after every navigation.
+  useEffect(() => {
+    const handleHashChange = () => setCurrentHash(window.location.hash || '#/admin');
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {

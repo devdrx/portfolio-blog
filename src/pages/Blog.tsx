@@ -53,16 +53,21 @@ const renderer = {
       console.warn(err);
     }
 
-    const escapedText = encodeURIComponent(text);
+    // Base64's alphabet (A-Za-z0-9+/=) contains no HTML/JS-special characters,
+    // so it can be embedded in a data-attribute with no further escaping —
+    // unlike encodeURIComponent, which preserves quotes and breaks when the
+    // code sample itself contains one (and was previously interpolated into
+    // an inline onclick string, which is itself unsafe).
+    const encodedCode = btoa(unescape(encodeURIComponent(text)));
 
     return `
       <div class="code-block-container" style="margin: 18px 0; border: 1px solid var(--nier-border); background-color: rgba(0,0,0,0.03); box-shadow: 1px 1px 0px rgba(0,0,0,0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; background-color: var(--nier-bg-alt); padding: 4px 10px; font-size: 11px; font-family: var(--font-mono); border-bottom: 1px solid var(--nier-border-muted);">
           <span>CODE_MODULE // ${lang.toUpperCase()}</span>
-          <button 
-            class="nier-btn small" 
+          <button
+            class="nier-btn small code-copy-btn"
             style="padding: 2px 6px; font-size: 9px; cursor: pointer;"
-            onclick="navigator.clipboard.writeText(decodeURIComponent('${escapedText}')).then(() => { this.textContent = '[ COPIED ]'; setTimeout(() => this.textContent = '[ COPY ]', 1500); }).catch(() => { this.textContent = '[ COPIED ]'; setTimeout(() => this.textContent = '[ COPY ]', 1500); });"
+            data-code="${encodedCode}"
           >
             [ COPY ]
           </button>
@@ -75,9 +80,40 @@ const renderer = {
 
 marked.use({ renderer });
 
+// Delegated click handler for the [ COPY ] buttons rendered above. Since the
+// buttons live inside dangerouslySetInnerHTML content, wire this to onClick
+// on an ancestor element rather than relying on inline onclick attributes.
+export const handleCodeCopyClick = (e: React.MouseEvent) => {
+  const button = (e.target as HTMLElement).closest('.code-copy-btn') as HTMLButtonElement | null;
+  if (!button) return;
+  const encoded = button.dataset.code;
+  if (!encoded) return;
+
+  try {
+    const text = decodeURIComponent(escape(atob(encoded)));
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        const original = button.textContent;
+        button.textContent = '[ COPIED ]';
+        setTimeout(() => { button.textContent = original; }, 1500);
+      })
+      .catch(() => {});
+  } catch {
+    // Malformed data-code attribute — nothing to copy
+  }
+};
+
 // Math preprocessor using KaTeX
 const preprocessMath = (text: string): string => {
-  let temp = text;
+  // Mask fenced and inline code first so `$` characters inside code samples
+  // (bash's $HOME, jQuery's $(...), etc.) aren't misread as KaTeX delimiters —
+  // this preprocessor runs on the raw markdown, before marked has any notion
+  // of what's a code block.
+  const codeSnippets: string[] = [];
+  let temp = text.replace(/```[\s\S]*?```|`[^`\n]+`/g, (match) => {
+    codeSnippets.push(match);
+    return ` CODESNIPPET${codeSnippets.length - 1} `;
+  });
 
   // 1. Process block math $$ ... $$
   temp = temp.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
@@ -96,6 +132,9 @@ const preprocessMath = (text: string): string => {
       return `<span class="katex-error" style="color: var(--nier-accent);">${math}</span>`;
     }
   });
+
+  // Restore the masked code snippets verbatim
+  temp = temp.replace(/ CODESNIPPET(\d+) /g, (_, idx) => codeSnippets[Number(idx)]);
 
   return temp;
 };
@@ -143,10 +182,14 @@ export const Blog: React.FC = () => {
   // Initial load
   useEffect(() => {
     const loadBlogPosts = async () => {
-      const data = await postsService.getPosts({ includeDrafts: false });
-      setPosts(data);
-      if (data.length > 0) {
-        setActivePostId(data[0].id);
+      try {
+        const data = await postsService.getPosts({ includeDrafts: false });
+        setPosts(data);
+        if (data.length > 0) {
+          setActivePostId(data[0].id);
+        }
+      } catch (err) {
+        console.error('Failed loading blog posts:', err);
       }
     };
     loadBlogPosts();
@@ -512,7 +555,7 @@ export const Blog: React.FC = () => {
               </div>
 
               {/* Content Area */}
-              <div 
+              <div
                 style={{
                   ...getFontSizeStyle(),
                   fontFamily: fontFamily === 'mono' ? 'var(--font-mono)' : 'var(--font-sans)',
@@ -520,6 +563,7 @@ export const Blog: React.FC = () => {
                   color: 'var(--nier-text)',
                 }}
                 className="blog-content"
+                onClick={handleCodeCopyClick}
               >
                 <div dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(activePost.content) }} />
               </div>

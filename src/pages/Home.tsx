@@ -163,6 +163,7 @@ export const Home: React.FC = () => {
   const [ghStats, setGhStats] = useState<{ repos: number; followers: number } | null>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
   const logIdxRef = useRef(0);
+  const scanTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Auto-scroll terminal on new log
   useEffect(() => {
@@ -221,7 +222,9 @@ export const Home: React.FC = () => {
 
   // Load projects + pfp
   useEffect(() => {
-    projectsService.getProjects({ includeHidden: false }).then(setProjects);
+    projectsService.getProjects({ includeHidden: false })
+      .then(setProjects)
+      .catch(err => console.error('Failed loading projects:', err));
     fetch('/api/settings').then(r => r.json()).then(data => {
       if (data.pfpUrl) setPfpUrl(data.pfpUrl);
     }).catch(() => {});
@@ -233,12 +236,21 @@ export const Home: React.FC = () => {
     Sound.playWarning();
     setScanning(true);
     SCAN_SEQUENCE.forEach((line, i) => {
-      setTimeout(() => {
+      const id = setTimeout(() => {
         setLogs(prev => [...prev, { text: line, type: i >= 4 ? 'critical' : 'scan' }]);
         if (i === SCAN_SEQUENCE.length - 1) setScanning(false);
       }, i * 600);
+      scanTimeoutsRef.current.push(id);
     });
   }, [scanning]);
+
+  // Cancel any pending scan timeouts if the component unmounts mid-scan
+  useEffect(() => {
+    const timeouts = scanTimeoutsRef.current;
+    return () => {
+      timeouts.forEach(clearTimeout);
+    };
+  }, []);
 
   const getLogColor = (type: string) => {
     if (type === 'critical' || type === 'scan') return 'var(--nier-accent)';

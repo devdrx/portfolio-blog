@@ -262,7 +262,7 @@ export const Settings: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>LOCAL_STORAGE CACHE SIZE:</span>
+                <span>MEDIA VAULT SIZE:</span>
                 <span>{localStorageKB} KB</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -411,7 +411,7 @@ export const Settings: React.FC = () => {
               {/* Actions */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <p style={{ fontSize: '11px', color: 'var(--nier-text-muted)', fontFamily: 'var(--font-mono)', lineHeight: 1.5 }}>
-                  Upload replaces the portrait on the homepage. Stored in localStorage as base64.
+                  Upload replaces the portrait on the homepage. Stored on the server and served from disk.
                 </p>
 
                 <button

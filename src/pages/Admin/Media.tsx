@@ -29,9 +29,15 @@ export const Media: React.FC = () => {
 
   const loadMediaFiles = async () => {
     setLoading(true);
-    const data = await mediaService.getMediaFiles();
-    setFiles(data);
-    setLoading(false);
+    try {
+      const data = await mediaService.getMediaFiles();
+      setFiles(data);
+    } catch (err) {
+      console.error('Failed loading media files:', err);
+      showToastMessage('Failed to load media archives from server.', true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const showToastMessage = (message: string, isAlert = false) => {
@@ -83,9 +89,8 @@ export const Media: React.FC = () => {
         showToastMessage('Copied Data URL to clipboard.');
       })
       .catch(() => {
-        // Safe sandbox fallback
-        Sound.playChime();
-        showToastMessage('Copied Data URL to clipboard.');
+        Sound.playWarning();
+        showToastMessage('Failed to copy: clipboard access denied.', true);
       });
   };
 
@@ -97,10 +102,15 @@ export const Media: React.FC = () => {
 
   const handleConfirmDelete = async () => {
     if (!confirmDeleteId) return;
-    await mediaService.deleteFile(confirmDeleteId);
-    showToastMessage('Asset file purged.');
-    if (activeFile?.id === confirmDeleteId) {
-      setActiveFile(null);
+    const deleted = await mediaService.deleteFile(confirmDeleteId);
+    if (deleted) {
+      showToastMessage('Asset file purged.');
+      if (activeFile?.id === confirmDeleteId) {
+        setActiveFile(null);
+      }
+    } else {
+      Sound.playWarning();
+      showToastMessage('Failed to purge asset: server connection error.', true);
     }
     setConfirmDeleteId(null);
     loadMediaFiles();

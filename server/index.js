@@ -8,8 +8,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import multer from 'multer';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { existsSync, mkdirSync, unlinkSync, readdirSync } from 'fs';
-import { join, dirname, extname } from 'path';
+import { join, dirname, extname, basename } from 'path';
 import { fileURLToPath } from 'url';
 import { Post, Project, Media, Setting, Log, Auth, OtakuRecord, seedDatabase } from './db.js';
 import Jimp from 'jimp';
@@ -20,6 +21,40 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 const CLIENT_ID = process.env.SOUNDCLOUD_CLIENT_ID;
+
+// ─── Session token signing ───────────────────────────────────────────────────
+// Tokens are base64(payload) + '.' + HMAC-SHA256(payload, SESSION_SECRET), so a
+// client can no longer forge an admin session by hand-crafting the base64 JSON.
+if (!process.env.SESSION_SECRET) {
+  console.warn('[SECURITY WARNING] SESSION_SECRET is not set in .env — using a random secret generated for this process. All admin sessions will be invalidated on every server restart. Set SESSION_SECRET in .env to avoid this.');
+}
+const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(48).toString('hex');
+
+function signToken(payload) {
+  const payloadB64 = Buffer.from(JSON.stringify(payload)).toString('base64');
+  const signature = crypto.createHmac('sha256', SESSION_SECRET).update(payloadB64).digest('base64url');
+  return `${payloadB64}.${signature}`;
+}
+
+// Returns the decoded payload if the token's signature is valid, otherwise null.
+function verifyToken(token) {
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [payloadB64, signature] = parts;
+
+  const expectedSignature = crypto.createHmac('sha256', SESSION_SECRET).update(payloadB64).digest('base64url');
+  const sigBuf = Buffer.from(signature);
+  const expectedBuf = Buffer.from(expectedSignature);
+  if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(Buffer.from(payloadB64, 'base64').toString('utf-8'));
+  } catch {
+    return null;
+  }
+}
 
 // SoundCloud config
 const SC_USER_ID = 936751612;
@@ -43,6 +78,9 @@ const SONGS_DIR = join(__dirname, '..', 'public', 'songs');
 if (!existsSync(SONGS_DIR)) mkdirSync(SONGS_DIR, { recursive: true });
 
 // ─── Multer upload middleware ──────────────────────────────────────────────────
+const ALLOWED_UPLOAD_MIME_TYPES = /^image\/(jpeg|png|gif|webp|svg\+xml)$/;
+const ALLOWED_UPLOAD_EXTENSIONS = /\.(jpe?g|png|gif|webp|svg)$/i;
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, UPLOADS_DIR);
@@ -53,7 +91,19 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + extname(file.originalname));
   }
 });
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB hard cap, enforced server-side
+  fileFilter: (req, file, cb) => {
+    // Client-side "accept=image/*" and size checks are cosmetic only — verify
+    // both the declared mimetype and file extension here before accepting.
+    if (ALLOWED_UPLOAD_MIME_TYPES.test(file.mimetype) && ALLOWED_UPLOAD_EXTENSIONS.test(file.originalname)) {
+      cb(null, true);
+    } else {
+      cb(new Error('INVALID_FILE_TYPE: Only image uploads (jpg, png, gif, webp, svg) are permitted.'));
+    }
+  }
+});
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors({
@@ -79,15 +129,11 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({ error: 'UNAUTHORIZED: Malformed session token.' });
   }
 
-  try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
-    if (Date.now() > decoded.exp || decoded.role !== 'admin') {
-      return res.status(401).json({ error: 'UNAUTHORIZED: Session expired or invalid.' });
-    }
-    next();
-  } catch {
-    return res.status(401).json({ error: 'UNAUTHORIZED: Malformed session token.' });
+  const decoded = verifyToken(token);
+  if (!decoded || !decoded.exp || Date.now() > decoded.exp || decoded.role !== 'admin') {
+    return res.status(401).json({ error: 'UNAUTHORIZED: Session expired or invalid.' });
   }
+  next();
 };
 
 // ─── POSTS REST ENDPOINTS ─────────────────────────────────────────────────────
@@ -238,7 +284,10 @@ app.delete('/api/media/:id', authenticate, async (req, res) => {
     if (file) {
       // Delete physical file from disk if it was uploaded locally
       if (file.url.startsWith('/api/uploads/')) {
-        const filename = file.url.replace('/api/uploads/', '').split('?')[0];
+        // basename() strips any directory components (e.g. "../../etc/passwd"),
+        // so a crafted url (via /api/system/import, which accepts arbitrary
+        // media records) can't be used to delete files outside UPLOADS_DIR.
+        const filename = basename(file.url.replace('/api/uploads/', '').split('?')[0]);
         const filePath = join(UPLOADS_DIR, filename);
         try {
           if (existsSync(filePath)) unlinkSync(filePath);
@@ -305,7 +354,10 @@ app.get('/api/logs', authenticate, async (req, res) => {
   }
 });
 
-app.post('/api/logs', authenticate, async (req, res) => {
+// Not gated by authenticate(): this records security-relevant events (failed
+// login attempts, logout) that by definition happen without a valid admin
+// session. Entry count is capped at 120 below to bound abuse from spam.
+app.post('/api/logs', async (req, res) => {
   try {
     const newLog = await Log.create({
       _id: `log-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -371,7 +423,7 @@ app.post('/api/settings/pfp', authenticate, upload.single('file'), async (req, r
 
     // Delete old pfp file if it was locally uploaded
     if (settings.pfpUrl && settings.pfpUrl.startsWith('/api/uploads/')) {
-      const oldFilename = settings.pfpUrl.split('?')[0].replace('/api/uploads/', '');
+      const oldFilename = basename(settings.pfpUrl.split('?')[0].replace('/api/uploads/', ''));
       const oldFilePath = join(UPLOADS_DIR, oldFilename);
       try {
         if (existsSync(oldFilePath)) unlinkSync(oldFilePath);
@@ -500,13 +552,12 @@ app.post('/api/auth/setup', async (req, res) => {
     auth.adminPasswordHash = hash;
     await auth.save();
 
-    // Simulate token generation (expires in 2 hours)
-    const tokenPayload = {
+    // Signed session token (expires in 2 hours)
+    const token = signToken({
       userId: 'admin',
       role: 'admin',
       exp: Date.now() + 2 * 60 * 60 * 1000
-    };
-    const token = Buffer.from(JSON.stringify(tokenPayload)).toString('base64');
+    });
     res.json({ success: true, token });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -527,12 +578,11 @@ app.post('/api/auth/login', async (req, res) => {
 
     const matches = bcrypt.compareSync(password, auth.adminPasswordHash);
     if (matches) {
-      const tokenPayload = {
+      const token = signToken({
         userId: 'admin',
         role: 'admin',
         exp: Date.now() + 2 * 60 * 60 * 1000
-      };
-      const token = Buffer.from(JSON.stringify(tokenPayload)).toString('base64');
+      });
       res.json({ success: true, token });
     } else {
       res.status(401).json({ error: 'SECURITY REJECTION: Access key mismatch.' });
@@ -553,17 +603,17 @@ app.post('/api/auth/change-password', async (req, res) => {
     return res.status(401).json({ error: 'UNAUTHORIZED: Malformed session token.' });
   }
 
-  try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
-    if (Date.now() > decoded.exp || decoded.role !== 'admin') {
-      return res.status(401).json({ error: 'UNAUTHORIZED: Session expired or invalid.' });
-    }
-  } catch {
-    return res.status(401).json({ error: 'UNAUTHORIZED: Malformed session token.' });
+  const decoded = verifyToken(token);
+  if (!decoded || !decoded.exp || Date.now() > decoded.exp || decoded.role !== 'admin') {
+    return res.status(401).json({ error: 'UNAUTHORIZED: Session expired or invalid.' });
   }
 
   try {
     let auth = await Auth.findById('auth-global');
+    if (!auth || !auth.isInitialized) {
+      return res.status(401).json({ error: 'UNAUTHORIZED: Security database not initialized.' });
+    }
+
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
@@ -697,14 +747,17 @@ app.get('/api/wallpapers', (req, res) => {
     }
     const files = readdirSync(WALLPAPERS_DIR)
       .filter(file => file !== 'thumbs' && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file));
-      
+
     let hasMissingThumbs = false;
     const result = files.map(file => {
-      const thumbExists = existsSync(join(THUMBS_DIR, file));
+      // Jimp can't rasterize SVG, so it never gets a generated thumbnail —
+      // serve the original in its place instead of retrying forever.
+      const isSvg = /\.svg$/i.test(file);
+      const thumbExists = isSvg || existsSync(join(THUMBS_DIR, file));
       if (!thumbExists) hasMissingThumbs = true;
       return {
         original: `/wallpapers/${file}`,
-        thumbnail: thumbExists ? `/wallpapers/thumbs/${file}` : null // null indicates it is being generated
+        thumbnail: isSvg ? `/wallpapers/${file}` : (thumbExists ? `/wallpapers/thumbs/${file}` : null) // null indicates it is being generated
       };
     });
 
@@ -712,7 +765,7 @@ app.get('/api/wallpapers', (req, res) => {
 
     // Generate missing thumbnails asynchronously in the background
     if (hasMissingThumbs) {
-      files.forEach(async (file) => {
+      files.filter(file => !/\.svg$/i.test(file)).forEach(async (file) => {
         const originalPath = join(WALLPAPERS_DIR, file);
         const thumbPath = join(THUMBS_DIR, file);
         if (!existsSync(thumbPath)) {
@@ -767,8 +820,10 @@ const DIST_DIR = join(__dirname, '..', 'dist');
 if (existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
   app.use((req, res, next) => {
-    // Return index.html for client-side single-page app routing (except for API requests)
-    if (!req.path.startsWith('/api') && req.method === 'GET') {
+    // Return index.html for client-side single-page app routing, but only for
+    // routes (no file extension) — a missing static asset (.js, .png, etc.)
+    // should still 404 instead of silently getting served an HTML document.
+    if (!req.path.startsWith('/api') && req.method === 'GET' && !extname(req.path)) {
       res.sendFile(join(DIST_DIR, 'index.html'));
     } else {
       next();
@@ -781,9 +836,10 @@ const generateAllThumbnails = async () => {
   console.log('[DATABASE] Scanning wallpapers for missing thumbnails...');
   try {
     if (!existsSync(WALLPAPERS_DIR)) return;
+    // SVG excluded — Jimp can't rasterize it, so it never needs a thumbnail.
     const files = readdirSync(WALLPAPERS_DIR)
-      .filter(file => file !== 'thumbs' && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file));
-      
+      .filter(file => file !== 'thumbs' && /\.(jpg|jpeg|png|gif|webp)$/i.test(file));
+
     for (const file of files) {
       const originalPath = join(WALLPAPERS_DIR, file);
       const thumbPath = join(THUMBS_DIR, file);
@@ -802,6 +858,17 @@ const generateAllThumbnails = async () => {
     console.error('[DATABASE] Thumbnail scan failed:', err.message);
   }
 };
+
+// Catch multer upload rejections (bad file type / too large) and report as JSON
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: `UPLOAD_ERROR: ${err.message}` });
+  }
+  if (err) {
+    return res.status(400).json({ error: err.message || 'UPLOAD_ERROR: Invalid file.' });
+  }
+  next();
+});
 
 app.listen(PORT, async () => {
   // Boot check: populate database tables if empty

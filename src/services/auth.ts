@@ -67,7 +67,9 @@ export const authService = {
     const token = sessionStorage.getItem(SESSION_KEY);
     if (!token) return false;
     try {
-      const decoded: SessionPayload = JSON.parse(atob(token));
+      // Token is base64(payload) + '.' + signature; the server verifies the
+      // signature, this decode is only for client-side UX (which view to show).
+      const decoded: SessionPayload = JSON.parse(atob(token.split('.')[0]));
       const expired = Date.now() > decoded.exp;
       if (expired) {
         sessionStorage.removeItem(SESSION_KEY);
@@ -86,7 +88,7 @@ export const authService = {
     const token = sessionStorage.getItem(SESSION_KEY);
     if (!token) return 0;
     try {
-      const decoded: SessionPayload = JSON.parse(atob(token));
+      const decoded: SessionPayload = JSON.parse(atob(token.split('.')[0]));
       return Math.max(0, Math.ceil((decoded.exp - Date.now()) / 1000));
     } catch {
       return 0;

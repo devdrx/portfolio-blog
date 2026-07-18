@@ -65,8 +65,9 @@ const SettingSchema = new mongoose.Schema({
 const LogSchema = new mongoose.Schema({
   _id: { type: String, required: true }, // 'log-timestamp'
   timestamp: String,
+  module: String,
   message: String,
-  type: String
+  isAlert: { type: Boolean, default: false }
 }, schemaOptions);
 
 // ─── Auth Schema ─────────────────────────────────────────────────────────────

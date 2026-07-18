@@ -14,7 +14,13 @@ class SoundSynthesizer {
     }
     const savedVol = localStorage.getItem('yorha_sound_volume');
     if (savedVol !== null) {
-      this.volume = parseFloat(savedVol);
+      const parsed = parseFloat(savedVol);
+      // A corrupt/non-numeric stored value would otherwise set this.volume to
+      // NaN, and every gain.setValueAtTime(NaN, ...) call afterward throws —
+      // silently breaking all sound playback until localStorage is cleared.
+      if (!Number.isNaN(parsed)) {
+        this.volume = Math.max(0, Math.min(1, parsed));
+      }
     }
   }
 
@@ -46,6 +52,7 @@ class SoundSynthesizer {
   }
 
   public setVolume(vol: number) {
+    if (Number.isNaN(vol)) return;
     this.volume = Math.max(0, Math.min(1, vol));
     localStorage.setItem('yorha_sound_volume', String(this.volume));
     if (this.volumeNode && this.ctx && !this.muted) {

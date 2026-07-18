@@ -45,6 +45,7 @@ export const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState('');
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentHash, setCurrentHash] = useState(window.location.hash);
 
   // Load configuration and start clock & hash routing
   useEffect(() => {
@@ -64,7 +65,8 @@ export const App: React.FC = () => {
     // Hash sync routing helper
     const handleHashChange = () => {
       const hashString = window.location.hash;
-      
+      setCurrentHash(hashString);
+
       if (hashString.startsWith('#/admin')) {
         setIsAdminMode(true);
       } else {
@@ -194,8 +196,8 @@ export const App: React.FC = () => {
   };
 
   const renderAdminView = () => {
-    const hash = window.location.hash;
-    
+    const hash = currentHash;
+
     return (
       <Suspense fallback={<div className="loading-fallback" style={{ fontFamily: 'var(--font-mono)', color: 'var(--nier-text-muted)', fontSize: '11px', textAlign: 'center', padding: '40px' }}>&gt; LOADING SECURE MODULE...</div>}>
         {(() => {
@@ -413,7 +415,7 @@ export const App: React.FC = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-              <span>TELEMETRY_UTC: {currentTime}</span>
+              <span>TELEMETRY_LOCAL: {currentTime}</span>
               <span style={{ 
                 width: '6px', 
                 height: '6px', 

@@ -222,8 +222,8 @@ export const ArtWeeb: React.FC = () => {
   };
 
   const playTrack = (idx: number, autoPlay = true) => {
-    if (songs.length === 0) return;
-    const track = songs[idx];
+    if (songsRef.current.length === 0) return;
+    const track = songsRef.current[idx];
 
     // Clean up active audio if exists
     if (audioRef.current) {
@@ -256,7 +256,12 @@ export const ArtWeeb: React.FC = () => {
       audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
     
-    // Disconnect old analyser if exists
+    // Disconnect old source/analyser nodes before creating new ones, otherwise
+    // each track change leaks a MediaElementSourceNode tied to the previous
+    // (now-discarded) audio element.
+    if (sourceRef.current) {
+      sourceRef.current.disconnect();
+    }
     if (analyserRef.current) {
       analyserRef.current.disconnect();
     }
