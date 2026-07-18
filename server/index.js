@@ -114,6 +114,16 @@ app.use(express.json({ limit: '10mb' }));
 
 // Static file serving of uploads directory
 app.use('/api/uploads', express.static(UPLOADS_DIR));
+// Serve wallpapers, thumbnails, and songs under /api/ so a split deployment
+// (frontend on Vercel, backend on Render) can reach them: Vercel only proxies
+// /api/* to the backend, so any backend-owned asset must live under that prefix.
+// redirect:false so a bare "/api/wallpapers" (no filename) falls through to the
+// JSON list endpoint below instead of static's default 301-to-trailing-slash,
+// which would otherwise shadow GET /api/wallpapers and GET /api/songs.
+app.use('/api/wallpapers/thumbs', express.static(THUMBS_DIR, { redirect: false }));
+app.use('/api/wallpapers', express.static(WALLPAPERS_DIR, { redirect: false }));
+app.use('/api/songs', express.static(SONGS_DIR, { redirect: false }));
+// Legacy non-/api paths kept for same-origin deploys (backend serving the SPA).
 app.use('/wallpapers', express.static(WALLPAPERS_DIR));
 app.use('/songs', express.static(SONGS_DIR));
 
@@ -756,8 +766,8 @@ app.get('/api/wallpapers', (req, res) => {
       const thumbExists = isSvg || existsSync(join(THUMBS_DIR, file));
       if (!thumbExists) hasMissingThumbs = true;
       return {
-        original: `/wallpapers/${file}`,
-        thumbnail: isSvg ? `/wallpapers/${file}` : (thumbExists ? `/wallpapers/thumbs/${file}` : null) // null indicates it is being generated
+        original: `/api/wallpapers/${file}`,
+        thumbnail: isSvg ? `/api/wallpapers/${file}` : (thumbExists ? `/api/wallpapers/thumbs/${file}` : null) // null indicates it is being generated
       };
     });
 
@@ -796,7 +806,7 @@ app.get('/api/songs', (req, res) => {
         const name = file.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
         return {
           title: name.charAt(0).toUpperCase() + name.slice(1),
-          url: `/songs/${file}`
+          url: `/api/songs/${file}`
         };
       });
     res.json(files);
