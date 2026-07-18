@@ -6,7 +6,11 @@ dotenv.config();
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/yorha_portfolio';
 
 console.log('[DATABASE] Connecting to MongoDB...');
-mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 })
+// 30s (the mongoose default) rather than an aggressive 5s: the initial Atlas
+// handshake (SRV lookup + TLS to each shard + replica-set discovery + auth) can
+// exceed 5s on high-latency/jittery links (e.g. mobile tethering), which
+// otherwise surfaces as a misleading "IP not whitelisted" server-selection error.
+mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 30000 })
   .then(() => console.log('[DATABASE] MongoDB connection established successfully.'))
   .catch(err => console.error('[DATABASE] ERROR: Connection failed:', err.message));
 
