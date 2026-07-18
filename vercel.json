@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://your-backend-on-render.onrender.com/api/:path*"
+      "destination": "https://portfolio-blog-backend-hbve.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
