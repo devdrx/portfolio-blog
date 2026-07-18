@@ -16,7 +16,11 @@ export const SystemSettings: React.FC = () => {
     setShowScanlines(savedScanlines !== 'false');
 
     const savedSpeed = localStorage.getItem('yorha_typewriter_speed');
-    if (savedSpeed) setTypeSpeed(parseInt(savedSpeed));
+    if (savedSpeed) {
+      const parsed = parseInt(savedSpeed, 10);
+      // Guard against a corrupt stored value making the range input value={NaN}.
+      if (!Number.isNaN(parsed)) setTypeSpeed(parsed);
+    }
   }, []);
 
   const handleMuteToggle = () => {
@@ -193,7 +197,7 @@ export const SystemSettings: React.FC = () => {
           <div className="nier-panel" style={{ display: 'flex', gap: '10px', padding: '15px' }}>
             <ShieldCheck size={20} style={{ color: 'var(--nier-accent)', flexShrink: 0 }} />
             <div style={{ fontSize: '12px' }}>
-              <strong>YoRHa FIRMWARE OK:</strong> All settings are validated and cached in the browser's sandbox index (\`localStorage\`). Reboots will not clean loaded chip values.
+              <strong>YoRHa FIRMWARE OK:</strong> All settings are validated and cached in the browser's sandbox index (localStorage). Reboots will not clean loaded chip values.
             </div>
           </div>
 

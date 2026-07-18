@@ -47,6 +47,7 @@ function getMetricColor(score) {
 (async () => {
   const targetUrl = process.argv[2];
   let previewProcess = null;
+  let chrome = null;
   let urlToAudit = targetUrl;
   const port = 4173;
 
@@ -83,7 +84,7 @@ function getMetricColor(score) {
 
     // 3. Launch headless Chrome
     console.log('Launching headless Chrome for performance capture...');
-    const chrome = await chromeLauncher.launch({
+    chrome = await chromeLauncher.launch({
       chromeFlags: ['--headless', '--disable-gpu', '--no-sandbox']
     });
 
@@ -170,12 +171,14 @@ function getMetricColor(score) {
     console.log('\x1b[1m==================================================\x1b[0m');
     console.log(`Full report details saved to: ${reportPath}\n`);
 
-    // Clean up Chrome
-    await chrome.kill();
-
   } catch (error) {
     console.error('\x1b[31mError during performance audit:\x1b[0m', error);
   } finally {
+    // Kill Chrome here (not on the success path) so it isn't orphaned when
+    // lighthouse throws between launch and the end of the try block.
+    if (chrome) {
+      await chrome.kill().catch(() => {});
+    }
     if (previewProcess) {
       console.log('Shutting down local preview server...');
       previewProcess.kill();

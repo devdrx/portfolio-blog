@@ -41,6 +41,8 @@ export const ArtWeeb: React.FC = () => {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const animeTransitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wallpaperPollCountRef = useRef(0);
 
   // Refs to prevent stale closures in async audio event listeners
   const currentSongIdxRef = useRef(currentSongIdx);
@@ -133,15 +135,23 @@ export const ArtWeeb: React.FC = () => {
     fetchOtakuRecords();
   }, []);
 
-  // Poll wallpapers if any thumbnail is still generating (null)
+  // Poll wallpapers if any thumbnail is still generating (null). Bounded to a
+  // finite number of retries so a thumbnail that can never be produced (e.g. a
+  // corrupt image Jimp can't decode) doesn't cause an endless 2s fetch loop.
+  const MAX_WALLPAPER_POLLS = 15;
   useEffect(() => {
     if (wallpapers.length === 0) return;
     const hasGenerating = wallpapers.some((w) => !w.thumbnail);
-    if (hasGenerating) {
+    if (hasGenerating && wallpaperPollCountRef.current < MAX_WALLPAPER_POLLS) {
       const timer = setTimeout(() => {
+        wallpaperPollCountRef.current += 1;
         fetchWallpapers();
       }, 2000);
       return () => clearTimeout(timer);
+    }
+    if (!hasGenerating) {
+      // All thumbnails resolved — reset so a later batch of new uploads can poll again.
+      wallpaperPollCountRef.current = 0;
     }
   }, [wallpapers]);
 
@@ -298,6 +308,10 @@ export const ArtWeeb: React.FC = () => {
       if (audioCtxRef.current) {
         audioCtxRef.current.close().catch(() => {});
       }
+      // Cancel a pending anime-card transition so it doesn't setState post-unmount
+      if (animeTransitionTimeoutRef.current) {
+        clearTimeout(animeTransitionTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -432,7 +446,10 @@ export const ArtWeeb: React.FC = () => {
     if (idx === selectedAnimeIdx) return;
     Sound.playClick();
     setIsTransitioning(true);
-    setTimeout(() => {
+    if (animeTransitionTimeoutRef.current) {
+      clearTimeout(animeTransitionTimeoutRef.current);
+    }
+    animeTransitionTimeoutRef.current = setTimeout(() => {
       setSelectedAnimeIdx(idx);
       setIsTransitioning(false);
     }, 280);

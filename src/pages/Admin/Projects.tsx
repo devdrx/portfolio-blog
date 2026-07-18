@@ -45,9 +45,15 @@ export const Projects: React.FC = () => {
 
   const loadProjects = async () => {
     setLoading(true);
-    const data = await projectsService.getProjects({ includeHidden: true });
-    setProjects(data);
-    setLoading(false);
+    try {
+      const data = await projectsService.getProjects({ includeHidden: true });
+      setProjects(data);
+    } catch (err) {
+      console.error('Failed loading projects:', err);
+      showToastMessage('Failed to load project registry from server.', true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const showToastMessage = (message: string, isAlert = false) => {
@@ -104,12 +110,18 @@ export const Projects: React.FC = () => {
       visibility
     };
 
-    if (activeProject) {
-      await projectsService.updateProject(activeProject.id, payload);
-      showToastMessage('Project configuration updated.');
-    } else {
-      await projectsService.createProject(payload);
-      showToastMessage('New project registered.');
+    try {
+      if (activeProject) {
+        await projectsService.updateProject(activeProject.id, payload);
+        showToastMessage('Project configuration updated.');
+      } else {
+        await projectsService.createProject(payload);
+        showToastMessage('New project registered.');
+      }
+    } catch (err: any) {
+      Sound.playWarning();
+      showToastMessage(err.message || 'Failed to save project to server.', true);
+      return;
     }
 
     Sound.playChime();
@@ -124,8 +136,13 @@ export const Projects: React.FC = () => {
 
   const handleConfirmDelete = async () => {
     if (!confirmDeleteId) return;
-    await projectsService.deleteProject(confirmDeleteId);
-    showToastMessage('Project record deleted.');
+    const deleted = await projectsService.deleteProject(confirmDeleteId);
+    if (deleted) {
+      showToastMessage('Project record deleted.');
+    } else {
+      Sound.playWarning();
+      showToastMessage('Failed to delete project: server connection error.', true);
+    }
     setConfirmDeleteId(null);
     loadProjects();
   };
