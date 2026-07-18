@@ -30,3 +30,7 @@ dist-ssr
 
 # Wallpapers generated thumbnails
 public/wallpapers/thumbs/
+
+# Generated performance audit reports
+lighthouse_report.json
+lighthouse_console_report.json

@@ -107,6 +107,21 @@ export const App: React.FC = () => {
     // Global hidden keyboard triggers
     let typedSequence = '';
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Guard: some synthetic events have no key value
+      if (!e.key) return;
+
+      // Don't hijack keystrokes while the user is typing into a form field
+      // (e.g. the blog editor) — otherwise typing "access yorha" in a post
+      // body, or Ctrl+Shift+A in any input, unexpectedly navigates away.
+      const target = e.target as HTMLElement | null;
+      const isTypingContext = !!target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable
+      );
+      if (isTypingContext) return;
+
       // Escape — exit admin back to public
       if (e.key === 'Escape' && window.location.hash.startsWith('#/admin')) {
         e.preventDefault();
@@ -115,9 +130,6 @@ export const App: React.FC = () => {
         return;
       }
 
-      // Guard: some synthetic events have no key value
-      if (!e.key) return;
-
       // Check Ctrl+Shift+A
       if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
         e.preventDefault();
@@ -125,7 +137,7 @@ export const App: React.FC = () => {
         window.location.hash = '#/admin/login';
         return;
       }
-      
+
       // Capture typed letters for sequence check
       if (e.key.length === 1) {
         typedSequence = (typedSequence + e.key.toLowerCase()).slice(-12);

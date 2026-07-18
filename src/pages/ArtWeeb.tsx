@@ -310,6 +310,10 @@ export const ArtWeeb: React.FC = () => {
 
     let animId: number;
     let waveOffset = 0;
+    // fftSize is fixed at 256 everywhere in this component, so frequencyBinCount
+    // (fftSize / 2) never changes — allocate the buffer once and reuse it every
+    // frame instead of allocating a new Uint8Array ~60 times a second.
+    const dataArray = new Uint8Array(128);
 
     const draw = () => {
       const isDark = document.documentElement.classList.contains('theme-dark');
@@ -323,16 +327,13 @@ export const ArtWeeb: React.FC = () => {
       ctx.strokeStyle = colorWave;
       ctx.lineWidth = 2;
 
-      // Read real time-domain data if analyser node is available and playing
-      let dataArray = new Uint8Array(0);
-      if (analyserRef.current && isPlaying) {
-        analyserRef.current.fftSize = 256;
-        const bufferLength = analyserRef.current.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-        analyserRef.current.getByteTimeDomainData(dataArray);
+      const hasLiveData = !!analyserRef.current && isPlaying;
+      if (hasLiveData) {
+        analyserRef.current!.fftSize = 256;
+        analyserRef.current!.getByteTimeDomainData(dataArray);
       }
 
-      if (analyserRef.current && isPlaying && dataArray.length > 0) {
+      if (hasLiveData) {
         const sliceWidth = canvas.width / dataArray.length;
         let x = 0;
 

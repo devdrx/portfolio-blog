@@ -15,12 +15,7 @@ export const Login: React.FC = () => {
     authService.checkSetupStatus()
       .then(data => {
         setInitialized(data.initialized);
-        if (!data.initialized) {
-          // Play warning sound denoting uninitialized setup portal
-          Sound.playWarning();
-        } else {
-          Sound.playWarning();
-        }
+        Sound.playWarning();
       })
       .catch(() => {
         // Fallback to warning sound anyway
